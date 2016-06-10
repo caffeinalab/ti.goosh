@@ -84,9 +84,17 @@ public class TiGooshModule extends KrollModule {
 		errorCallback = (KrollFunction)options.get("error");
 		messageCallback = (KrollFunction)options.get("callback");
 
+		// Send old notification if present
+		Intent intent = TiApplication.getInstance().getRootOrCurrentActivity().getIntent();
+		if (intent.hasExtra("notification") || intent.hasExtra("data")) {
+			Log.d(LCAT, "Intent has notification in its extra");
+			sendMessage(intent.getStringExtra("notification"), intent.getStringExtra("data"), true);
+		} else {
+			Log.d(LCAT, "No notification in Intent");
+		}
+
 		if (checkPlayServices()) {
-			Intent intent = new Intent(activity, RegistrationIntentService.class);
-			TiApplication.getInstance().getRootActivity().startService(intent);
+			activity.startService( new Intent(activity, RegistrationIntentService.class) );
 		}
 	}
 
@@ -127,14 +135,7 @@ public class TiGooshModule extends KrollModule {
 		e.put("deviceToken", token);
 		successCallback.callAsync(getKrollObject(), e);
 
-		// Send old notification if present
-		Intent intent = TiApplication.getInstance().getRootOrCurrentActivity().getIntent();
-		if (intent.hasExtra("notification") || intent.hasExtra("data")) {
-			Log.d(LCAT, "Intent has notification in its extra");
-			sendMessage(intent.getStringExtra("notification"), intent.getStringExtra("data"), true);
-		} else {
-			Log.d(LCAT, "No notification in Intent");
-		}
+		
 	}
 
 	public void sendError(Exception ex) {
