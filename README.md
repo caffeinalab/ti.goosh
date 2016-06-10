@@ -1,6 +1,6 @@
 <img src="logo.jpg" />
 
-### Android Titanium module to work with Google Cloud Messaging push notification sertvice
+### Android Titanium module to work easily with Google Cloud Messaging push notification service
 
 We kept the same syntax of `Ti.Network` for iOS notifications, hope you like this choice :)
 
