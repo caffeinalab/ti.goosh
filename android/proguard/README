@@ -1,0 +1,2 @@
+Use the build.sh to build a stripped version of the Google Play Services
+The actual "google-play-services.jar" file is at revision 29, downloaded from https://dl-ssl.google.com/android/repository/google_play_services_8487000_r29.zip
