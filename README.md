@@ -206,7 +206,7 @@ You have to JSON parse the `notification` and `data` object on the javascript si
 
 The object passed in the `callback` contain also:
 
-### inBackground
+#### inBackground
 
 A boolean value indicating if the notification has come when the app was in background, and the user has explicited clicked on the banner.
 
