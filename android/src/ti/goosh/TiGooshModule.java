@@ -114,7 +114,6 @@ public class TiGooshModule extends KrollModule {
 
 	@Kroll.method
 	public int getAppBadge() {
-		// TODO
 		return 0;
 	}
 

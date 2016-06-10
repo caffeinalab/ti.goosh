@@ -43,9 +43,7 @@ public class IntentService extends GcmListenerService {
 
 	@Override
 	public void onMessageReceived(String from, Bundle bundle) {
-		Log.d(LCAT, "Push notification received");
-		Log.d(LCAT, "From: " + from);
-
+		Log.d(LCAT, "Push notification received from: " + from);
 		parseNotification(bundle);
 	}
 
@@ -54,7 +52,6 @@ public class IntentService extends GcmListenerService {
 		if (name != null) {
 			int index = name.lastIndexOf(".");
 			if (index > 0) name = name.substring(0, index);
-
 			try {
 				icon = TiRHelper.getApplicationResource(type + "." + name);
 			} catch (TiRHelper.ResourceNotFoundException ex) {
