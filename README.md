@@ -200,10 +200,17 @@ curl_close($ch);
 
 ## Handle the notification on the app
 
-The payload of the notifications is the same that comes from your server, with the addition of:
-
-* `inBackground`: A boolean value indicating if the notification has come when the app was in background, and the user has explicited clicked on the banner.
-
-## Important note
+The payload of the notifications is the same that comes from your server.
 
 You have to JSON parse the `notification` and `data` object on the javascript side.
+
+The object passed in the `callback` contain also:
+
+### inBackground
+
+A boolean value indicating if the notification has come when the app was in background, and the user has explicited clicked on the banner.
+
+## LICENSE
+
+MIT.
+
