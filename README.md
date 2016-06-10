@@ -5,7 +5,7 @@ The behaviour is the same of iOS:
 * if the app is in **background**, the standard OS view for incoming notifications is shown. If you click on that banner, the callback is invoked with the notification payload + the property `inBackground = true`.
 * if the app is in **foreground**, nothing is shown and you have to handle manually in the app (you can anyway override this behaviour).
 
-#### Set the sender ID
+### Set the sender ID
 
 In your tiapp.xml, insert
 
@@ -13,7 +13,7 @@ In your tiapp.xml, insert
 <property name="gcm.senderid">YOUR_SENDER_ID</property>
 ```
 
-#### Register for Push notifications
+### Register for Push notifications
 
 ```js
 var TiGoosh = require('ti.goosh');
@@ -43,23 +43,23 @@ TiGoosh.registerForPushNotifications({
 });
 ```
 
-#### Unregister
+### Unregister
 
 ```js
 TiGoosh.unregisterForPushNotifications();
 ```
 
-#### Properties
+### Properties
 
-##### `remoteNotificationsEnabled`
+#### `remoteNotificationsEnabled`
 
 Check if `registerForPushNotifications` has been called at least once
 
-##### `remoteDeviceUUID`
+#### `remoteDeviceUUID`
 
 Get the device token
 
-#### Set the badge
+### Set the badge
 
 *Due system limitations, currently the badge over the icon is supported only on Samsung and Sony devices. This is why there's no an "Android official method" to draw that badge, but only via private API.*
 
@@ -67,7 +67,7 @@ Get the device token
 gcm.setAppBadge(2);
 ```
 
-#### Setting the icon
+### Set the icon
 
 The module sets the notification tray icon taking it from `/platform/android/res/drawable-*`.
 
@@ -93,9 +93,9 @@ convert drawable-xxxhdpi/notificationicon.png -resize 36x36 drawable-hdpi/notifi
 convert drawable-xxxhdpi/notificationicon.png -resize 24x24 drawable-mdpi/notificationicon.png
 ```
 
-### If you don't set an icon, no notification is shown on the lock screen.
+## If you don't set an icon, no notification is shown on the lock screen.
 
-#### Send the notification from your server
+### Send the notification from your server
 
 The payload of the object is fully compatibile with the *Google Cloud Messaging* interface written here: [https://developers.google.com/cloud-messaging/http-server-ref#downstream-http-messages-json](https://developers.google.com/cloud-messaging/http-server-ref#downstream-http-messages-json)
 
@@ -103,57 +103,39 @@ See also [https://developer.android.com/reference/android/app/NotificationManage
 
 So you can write anything in your `data` object, instead the `notification` object can include:
 
-##### `body`
+#### `body`
 
-The message to show in the notification center and in the status bar.
+The message to show in the notification center and in the status bar. If not present, no message is shown in the notification center.
 
-If not present, no message is shown in the notification center.
+#### `title`
 
-##### `title`
+The title to show in the notification center.  Default to app title.
 
-The title to show in the notification center. 
+#### `sound`
 
-Default to app title.
+A sound relative to the "raw" (`android.resource://`) directory. If set to `true` or `default`, the default sound will be played. Default is no sound.
 
-##### `sound`
+#### `vibrate`
 
-A sound relative to the "raw" (`android.resource://`) directory.
+A boolean (`true` or `false`) value indicating if the phone should vibrate.  Default is to do not vibrate.
 
-If set to `true` or `default`, the default sound will be played.
+#### `badge`
 
-Default is no sound.
+An integer value for the badge. The icon on the launchscreen will display this number on the right-top corner if supported.  Default is no badge.
 
-##### `vibrate`
+#### `icon`
 
-A boolean (`true` or `false`) value indicating if the phone should vibrate. 
+A URL represting a large icon to show.  Default is no icon.
 
-Default is to do not vibrate.
-
-##### `badge`
-
-An integer value for the badge. The icon on the launchscreen will display this number on the right-top corner if supported. 
-
-Default is no badge.
-
-##### `icon`
-
-A URL represting a large icon to show. 
-
-Default is no icon.
-
-##### `color`
+#### `color`
 
 Background color of the notification icon
 
-##### `tag` and `id`
+#### `tag` and `id`
 
-`tag` is a string representing the tag of this notification.
+`tag` is a string representing the tag of this notification, `id` is an integer representing the ID of this notification.  The default value of the `id` is an auto-increment integer to avoid notifications collision.
 
-`id` is an integer representing the ID of this notification. 
-
-The default value of the `id` is an auto-increment integer to avoid notifications collision.
-
-This pair (`tag`, `id) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
+This pair (`tag`, `id`) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
 
 ### Additional properties
 
@@ -161,7 +143,7 @@ This pair (`tag`, `id) identifies this notification from your app to the system,
 
 A boolean value indicating that the notification must be shown as alert event when the app is in foreground.
 
-#### A PHP Example
+### A PHP Example of the server
 
 ```php
 <?php
@@ -197,12 +179,12 @@ echo curl_exec($ch);
 curl_close($ch);
 ```
 
-#### Handle the notification on the app
+### Handle the notification on the app
 
 The payload of the notifications is the same that comes from your server, with the addition of:
 
 * `inBackground`: A boolean value indicating if the notification has come when the app was in background, and the user has explicited clicked on the banner.
 
-##### Important note
+### Important note
 
 You have to JSON parse the `notification` and `data` object on the javascript side.
