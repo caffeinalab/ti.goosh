@@ -145,7 +145,7 @@ Default is no icon.
 
 Background color of the notification icon
 
-#### `tag` and `id`
+##### `tag` and `id`
 
 `tag` is a string representing the tag of this notification.
 
