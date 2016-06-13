@@ -126,17 +126,20 @@ So you can write anything in your `data` object, instead the `notification` obje
 
 Property | Type | Default | Description
 --- | ---| --- | ----
-body | String | `null` | The message to show in the notification center and in the status bar. If not present, no message is shown in the notification center. | 
+body | String | `null` | The message to show in the notification center and in the status bar. 
 title | String | The app name | The title to show in the notification center.
-vibrate | Boolean | `false` | A boolean value indicating if the phone should vibrate. 
-badge | Number | `null` | An integer value for the badge. The icon on the launchscreen will display this number on the right-top corner if supported.
+vibrate | Boolean | `false` | Control the vibration of the phone.
+badge | Number | `null` | The icon on the launchscreen will display this number on the right-top corner if supported.
 icon | String | The app small icon | A URL represting a large icon to show. 
 color | String | `null` | Background color of the notification icon
-tag | String | `null` | String representing the tag of this notification.
-id | Number | `null` | Integer representing the ID of this notification.
-force_show_in_foreground | Boolean | `false` | A boolean value indicating that the notification must be shown as alert event when the app is in foreground.
+tag | String | `null` | Tag of this notification.
+id | Number | `null` | ID of this notification.
+force_show_in_foreground | Boolean | `false` | Control if notification must be shown as alert even if app is in foreground.
 
-The pair (`tag`, `id`) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
+Notes:
+
+* If `body` is not present, no message is shown in the notification center.
+* The pair (`tag`, `id`) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
 
 ## A PHP Example
 
