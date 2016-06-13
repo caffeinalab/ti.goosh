@@ -72,13 +72,10 @@ TiGoosh.unregisterForPushNotifications();
 
 ## Properties
 
-#### remoteNotificationsEnabled
-
-Check if the notifications are active.
-
-#### remoteDeviceUUID
-
-Get the device token previously obtained.
+Property | Type | Description
+--- | ---| --- | ----
+remoteNotificationsEnabled | Boolean | Check if the notifications are active.
+remoteDeviceUUID | String | Get the device token previously obtained.
 
 ## Set the badge
 
