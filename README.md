@@ -124,43 +124,19 @@ See also [https://developer.android.com/reference/android/app/NotificationManage
 
 So you can write anything in your `data` object, instead the `notification` object can include:
 
-#### body
+Property | Type | Default | Description
+--- | ---| --- | ----
+body | String | `null` | The message to show in the notification center and in the status bar. If not present, no message is shown in the notification center. | 
+title | String | The app name | The title to show in the notification center.
+vibrate | Boolean | `false` | A boolean value indicating if the phone should vibrate. 
+badge | Number | `null` | An integer value for the badge. The icon on the launchscreen will display this number on the right-top corner if supported.
+icon | String | The app small icon | A URL represting a large icon to show. 
+color | String | `null` | Background color of the notification icon
+tag | String | `null` | String representing the tag of this notification.
+id | Number | `null` | Integer representing the ID of this notification.
+force_show_in_foreground | Boolean | `false` | A boolean value indicating that the notification must be shown as alert event when the app is in foreground.
 
-The message to show in the notification center and in the status bar. If not present, no message is shown in the notification center.
-
-#### title
-
-The title to show in the notification center.  Default to app title.
-
-#### sound
-
-A sound relative to the "raw" (`android.resource://`) directory. If set to `true` or `default`, the default sound will be played. Default is no sound.
-
-#### vibrate
-
-A boolean (`true` or `false`) value indicating if the phone should vibrate.  Default is to do not vibrate.
-
-#### badge
-
-An integer value for the badge. The icon on the launchscreen will display this number on the right-top corner if supported.  Default is no badge.
-
-#### icon
-
-A URL represting a large icon to show.  Default is no icon.
-
-#### color
-
-Background color of the notification icon
-
-#### tag / id
-
-`tag` is a string representing the tag of this notification, `id` is an integer representing the ID of this notification.  The default value of the `id` is an auto-increment integer to avoid notifications collision.
-
-This pair (`tag`, `id`) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
-
-#### force_show_in_foreground
-
-A boolean value indicating that the notification must be shown as alert event when the app is in foreground.
+The pair (`tag`, `id`) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
 
 ## A PHP Example
 
