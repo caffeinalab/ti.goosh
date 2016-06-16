@@ -44,6 +44,11 @@ public class IntentService extends GcmListenerService {
 	@Override
 	public void onMessageReceived(String from, Bundle bundle) {
 		Log.d(LCAT, "Push notification received from: " + from);
+		for (String key : bundle.keySet()) {
+			Object value = bundle.get(key);
+			Log.d(LCAT, String.format("Notification key : %s => %s (%s)", key, value.toString(), value.getClass().getName()));
+		}
+
 		parseNotification(bundle);
 	}
 
@@ -71,49 +76,43 @@ public class IntentService extends GcmListenerService {
 	}
 
 	private void parseNotification(Bundle bundle) {
-		for (String key : bundle.keySet()) {
-			Object value = bundle.get(key);
-			Log.d(LCAT, String.format("Notification key : %s => %s (%s)", key, value.toString(), value.getClass().getName()));
-		}
+		Context context = TiApplication.getInstance().getApplicationContext();
+		Boolean appInBackground = !TiApplication.isCurrentActivityInForeground();
 
-		TiApplication instance = TiApplication.getInstance();
-		Context context = instance.getApplicationContext();
-		String pkg = context.getPackageName();
+		Boolean showNotification = true;
 
-		Boolean appIsInForeground = TiApplication.isCurrentActivityInForeground();
-
-		JsonObject notif = null;
+		String jsonData = bundle.getString("data");
 		JsonObject data = null;
 
 		try {
-			notif = (JsonObject) new Gson().fromJson(bundle.getString("notification"), JsonObject.class);
-		} catch (Exception ex) {
-			Log.e(LCAT, "Error parsing notif JSON: " + ex.getMessage());
-		}
-
-		try {
-			data = (JsonObject) new Gson().fromJson(bundle.getString("data"), JsonObject.class);
+			data = (JsonObject) new Gson().fromJson(jsonData, JsonObject.class);
 		} catch (Exception ex) {
 			Log.e(LCAT, "Error parsing data JSON: " + ex.getMessage());
+			return;
 		}
 
-		Boolean sendToManager = true;
-		if (appIsInForeground) {
-			if (notif.has("force_show_in_foreground")) {
-				JsonPrimitive showInFore = notif.getAsJsonPrimitive("force_show_in_foreground");
-				sendToManager = ((showInFore.isBoolean() && showInFore.getAsBoolean() == true));
+		if (data != null && data.has("alert") == true) {
+			if (appInBackground) {
+				showNotification = true;
 			} else {
-				sendToManager = false;
+				if (data.has("force_show_in_foreground")) {
+					JsonPrimitive showInFore = data.getAsJsonPrimitive("force_show_in_foreground");
+					showNotification = ((showInFore.isBoolean() && showInFore.getAsBoolean() == true));
+				} else {
+					showNotification = false;
+				}
 			}
+		} else {
+			Log.i(LCAT, "Not showing notification cause missing data.alert");
+			showNotification = false;
 		}
 
-		if (sendToManager) {
+		if (showNotification) {
 
-			Intent launcherIntent = instance.getApplicationContext().getPackageManager().getLaunchIntentForPackage(pkg);
+			Intent launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
 			launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-			launcherIntent.putExtra("notification", bundle.getString("notification"));
-			launcherIntent.putExtra("data", bundle.getString("data"));
+			launcherIntent.putExtra("tigoosh.notification", jsonData);
 
 			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -127,20 +126,29 @@ public class IntentService extends GcmListenerService {
 
 			// Body 
 
-			String body = notif.getAsJsonPrimitive("body").getAsString();
-			builder.setContentText(body);
-			builder.setTicker(body);
+			String alert = null;
+			if (data.has("alert")) {
+				alert = data.getAsJsonPrimitive("alert").getAsString();
+				builder.setContentText(alert);
+				builder.setTicker(alert);
+			}
 
 			// Icons
 
-			int smallIcon = this.getResource("drawable", "notificationicon");
-			builder.setSmallIcon(smallIcon);
+			try {
+				int smallIcon = this.getResource("drawable", "notificationicon");
+				if (smallIcon > 0) {
+					builder.setSmallIcon(smallIcon);
+				}
+			} catch (Exception ex) {
+				Log.e(LCAT, "Smallicon exception: " + ex.getMessage());
+			}
 
 			// Large icon
 
-			if (notif.has("icon")) {
+			if (data.has("icon")) {
 				try {
-					Bitmap icon = this.getBitmapFromURL( notif.getAsJsonPrimitive("icon").getAsString() );
+					Bitmap icon = this.getBitmapFromURL( data.getAsJsonPrimitive("icon").getAsString() );
 					builder.setLargeIcon(icon);
 				} catch (Exception ex) {
 					Log.e(LCAT, "Icon exception: " + ex.getMessage());
@@ -149,9 +157,9 @@ public class IntentService extends GcmListenerService {
 
 			// Color
 
-			if (notif.has("color")) {
+			if (data.has("color")) {
 				try {
-					int color = Color.parseColor( notif.getAsJsonPrimitive("color").getAsString() );
+					int color = Color.parseColor( data.getAsJsonPrimitive("color").getAsString() );
 					builder.setColor( color );
 				} catch (Exception ex) {
 					Log.e(LCAT, "Color exception: " + ex.getMessage());
@@ -160,37 +168,37 @@ public class IntentService extends GcmListenerService {
 
 			// Title
 
-			if (notif.has("title")) {
-				builder.setContentTitle( notif.getAsJsonPrimitive("title").getAsString() );
+			if (data.has("title")) {
+				builder.setContentTitle( data.getAsJsonPrimitive("title").getAsString() );
 			} else {
-				builder.setContentTitle( instance.getAppInfo().getName() );
+				builder.setContentTitle( TiApplication.getInstance().getAppInfo().getName() );
 			}
 
 			// Badge
 
-			if (notif.has("badge")) {
-				int badge = notif.getAsJsonPrimitive("badge").getAsInt();
-				BadgeUtils.setBadge(TiApplication.getInstance().getApplicationContext(), badge);
+			if (data.has("badge")) {
+				int badge = data.getAsJsonPrimitive("badge").getAsInt();
+				BadgeUtils.setBadge(context, badge);
 				builder.setNumber(badge);
 			}
 
 			// Sound 
 
-			if (notif.has("sound")) {
-				JsonPrimitive sound = notif.getAsJsonPrimitive("sound");
+			if (data.has("sound")) {
+				JsonPrimitive sound = data.getAsJsonPrimitive("sound");
 				if ( ("default".equals(sound.getAsString())) || (sound.isBoolean() && sound.getAsBoolean() == true) ) {
 					builder_defaults |= Notification.DEFAULT_SOUND;
 				} else {
-					int resource = getResource("raw", notif.getAsJsonPrimitive("sound").getAsString());
-					builder.setSound( Uri.parse("android.resource://" + pkg + "/" + resource) );
+					int resource = getResource("raw", data.getAsJsonPrimitive("sound").getAsString());
+					builder.setSound( Uri.parse("android.resource://" + context.getPackageName() + "/" + resource) );
 				}
 			}
 
 			// Vibration
 
 			try {
-				if (notif.has("vibrate")) {
-					JsonPrimitive vibrate = notif.getAsJsonPrimitive("vibrate");
+				if (data.has("vibrate")) {
+					JsonPrimitive vibrate = data.getAsJsonPrimitive("vibrate");
 					if (vibrate.isBoolean() && vibrate.getAsBoolean() == true) {
 						builder_defaults |= Notification.DEFAULT_VIBRATE;
 					}
@@ -207,18 +215,17 @@ public class IntentService extends GcmListenerService {
 			// Tag
 
 			String tag = null;
-			if (notif.has("tag")) {
-				tag = notif.getAsJsonPrimitive("tag").getAsString();
+			if (data.has("tag")) {
+				tag = data.getAsJsonPrimitive("tag").getAsString();
 			}
 		
-
 			// Nid
 			
 			int id = 0;
-			if (notif.has("id")) {
+			if (data.has("id")) {
 				// ensure that the id sent from the server is negative to prevent
 				// collision with the atomic integer
-				id = -1 * Math.abs(notif.getAsJsonPrimitive("id").getAsInt());
+				id = -1 * Math.abs(data.getAsJsonPrimitive("id").getAsInt());
 			} else {
 				id = atomic.getAndIncrement();
 			}
@@ -229,7 +236,7 @@ public class IntentService extends GcmListenerService {
 		}
 
 		if (TiGooshModule.getInstance() != null) {
-			TiGooshModule.getInstance().sendMessage(bundle.getString("notification"), bundle.getString("data"), !appIsInForeground);
+			TiGooshModule.getInstance().sendMessage(jsonData, !appInBackground);
 		}
 	}
 

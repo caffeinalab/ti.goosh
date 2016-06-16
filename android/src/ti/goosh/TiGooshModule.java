@@ -31,7 +31,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 public class TiGooshModule extends KrollModule {
 
 	private static final String LCAT = "ti.goosh.TiGooshModule";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
 	private static TiGooshModule instance = null;
 
@@ -80,15 +80,15 @@ public class TiGooshModule extends KrollModule {
 	public void registerForPushNotifications(HashMap options) {
 		Activity activity = TiApplication.getAppRootOrCurrentActivity();
 
-		successCallback = (KrollFunction)options.get("success");
-		errorCallback = (KrollFunction)options.get("error");
-		messageCallback = (KrollFunction)options.get("callback");
+		successCallback = options.containsKey("success") ? (KrollFunction)options.get("success") : null;
+		errorCallback = options.containsKey("error") ? (KrollFunction)options.get("error") : null;
+		messageCallback = options.containsKey("callback") ? (KrollFunction)options.get("callback") : null;
 
 		// Send old notification if present
 		Intent intent = TiApplication.getInstance().getRootOrCurrentActivity().getIntent();
-		if (intent.hasExtra("notification") || intent.hasExtra("data")) {
+		if (intent.hasExtra("tigoosh.notification")) {
 			Log.d(LCAT, "Intent has notification in its extra");
-			sendMessage(intent.getStringExtra("notification"), intent.getStringExtra("data"), true);
+			sendMessage(intent.getStringExtra("tigoosh.notification"), true);
 		} else {
 			Log.d(LCAT, "No notification in Intent");
 		}
@@ -125,7 +125,9 @@ public class TiGooshModule extends KrollModule {
 		return 0;
 	}
 
-	public void sendSuccess(String token) {
+	public void sendSuccess(String _token) {
+		token = _token;
+
 		if (successCallback == null) {
 			Log.e(LCAT, "sendSuccess invoked but no successCallback defined");
 			return;
@@ -134,12 +136,13 @@ public class TiGooshModule extends KrollModule {
 		HashMap<String, Object> e = new HashMap<String, Object>();
 		e.put("deviceToken", token);
 		successCallback.callAsync(getKrollObject(), e);
-
-		
 	}
 
 	public void sendError(Exception ex) {
-		if (errorCallback == null) return;
+		if (errorCallback == null) {
+			Log.e(LCAT, "sendError invoked but no errorCallback defined");
+			return;
+		}
 
 		HashMap<String, Object> e = new HashMap<String, Object>();
 		e.put("error", ex.getMessage());
@@ -147,7 +150,7 @@ public class TiGooshModule extends KrollModule {
 		errorCallback.callAsync(getKrollObject(), e);
 	}
 
-	public void sendMessage(String notif, String data, Boolean inBackground) {
+	public void sendMessage(String data, Boolean inBackground) {
 		if (messageCallback == null) {
 			Log.e(LCAT, "sendMessage invoked but no messageCallback defined");
 			return;
@@ -155,7 +158,6 @@ public class TiGooshModule extends KrollModule {
 
 		try {
 			HashMap<String, Object> e = new HashMap<String, Object>();
-			e.put("notification", notif); // to parse on reverse on JS side
 			e.put("data", data); // to parse on reverse on JS side
 			e.put("inBackground", inBackground);
 

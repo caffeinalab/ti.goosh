@@ -43,7 +43,6 @@ TiGoosh.registerForPushNotifications({
 	callback: function(e) {
 	
 		var data = JSON.parse(e.data || '');
-		var notification = JSON.parse(e.notification || '');
 	
 	},
 
@@ -106,24 +105,21 @@ mkdir drawable-xxhdpi
 mkdir drawable-xhdpi
 mkdir drawable-hdpi
 mkdir drawable-mdpi
+convert drawable-xxxhdpi/notificationicon.png -resize 72x72 drawable-xxhdpi/notificationicon.png
 convert drawable-xxxhdpi/notificationicon.png -resize 48x48 drawable-xhdpi/notificationicon.png
 convert drawable-xxxhdpi/notificationicon.png -resize 36x36 drawable-hdpi/notificationicon.png
 convert drawable-xxxhdpi/notificationicon.png -resize 24x24 drawable-mdpi/notificationicon.png
 ```
 
-#### IMPORTANT NOTE: If you don't set an icon, no notification is shown on the lock screen.
-
 ## Send the notification from your server
 
-The payload of the object is fully compatibile with the *Google Cloud Messaging* interface written here: [https://developers.google.com/cloud-messaging/http-server-ref#downstream-http-messages-json](https://developers.google.com/cloud-messaging/http-server-ref#downstream-http-messages-json)
+All properties must be wrapper with a `data` object.
 
-See also [https://developer.android.com/reference/android/app/NotificationManager.html](https://developer.android.com/reference/android/app/NotificationManager.html) for references.
-
-So you can write anything in your `data` object, instead the `notification` object can include:
+The payload of the notification is compatible with *Parse server*.
 
 Property | Type | Default | Description
 --- | ---| --- | ----
-body | String | `null` | The message to show in the notification center and in the status bar. 
+alert | String | `null` | The message to show in the notification center and in the status bar. 
 title | String | The app name | The title to show in the notification center.
 vibrate | Boolean | `false` | Control the vibration of the phone.
 badge | Number | `null` | The icon on the launchscreen will display this number on the right-top corner if supported.
@@ -135,7 +131,7 @@ force_show_in_foreground | Boolean | `false` | Control if notification must be s
 
 Notes:
 
-* If `body` is not present, no message is shown in the notification center.
+* If `alert` is not present, no message is shown in the notification center.
 * The pair (`tag`, `id`) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
 
 ## A PHP Example
@@ -143,21 +139,23 @@ Notes:
 ```php
 <?php
 
+define('GOOGLE_KEY', '');
+
 $json = '{
   "registration_ids": ["DEVICETOKEN1", "DEVICETOKEN2"],
   "data":{
-    "notification": {
-      "body": "Body text",
+    "data": {
+      "alert": "Alert",
       "title": "Title",
       "vibrate": true,
       "sound": "default",
       "badge": 1,
       "tag": "APP",
       "id": 1,
-      "force_show_in_foreground": false
-    },
-    "data": {
-      "foo": "bar"
+      "force_show_in_foreground": false,
+      "data": {
+			"foo" : "bar"
+   	}
     }
   }
 }';
@@ -165,7 +163,7 @@ $json = '{
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'https://android.googleapis.com/gcm/send');
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [ 'Authorization: key=YOUR_GOOGLE_KEY', 'Content-Type: application/json' ]);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [ 'Authorization: key=' . GOOGLE_KEY, 'Content-Type: application/json' ]);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -176,7 +174,7 @@ curl_close($ch);
 
 ## Handle the notification on the app
 
-The payload of the notifications is the same that comes from your server. You have to JSON parse the `notification` and `data` object on the javascript side. The object passed in the `callback` contain also:
+The payload of the notifications is the same that comes from your server. You have to JSON parse the `data` object on the javascript side. The object passed in the `callback` contain also:
 
 #### inBackground
 
