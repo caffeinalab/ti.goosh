@@ -98,17 +98,24 @@ It should be flat (no gradients), white and face-on perspective. You have to gen
 88 × 88 area in 96 × 96 (xxxhdpi)
 ```
 
-You can use this script to generate it once you put the icon in `drawable-xxxhdpi/notificationicon.png`
+You can use this script to generate it once you put the icon in `drawable-xxxhdpi/notificationicon.png`.
 
 ```sh
-mkdir drawable-xxhdpi
-mkdir drawable-xhdpi
-mkdir drawable-hdpi
-mkdir drawable-mdpi
-convert drawable-xxxhdpi/notificationicon.png -resize 72x72 drawable-xxhdpi/notificationicon.png
-convert drawable-xxxhdpi/notificationicon.png -resize 48x48 drawable-xhdpi/notificationicon.png
-convert drawable-xxxhdpi/notificationicon.png -resize 36x36 drawable-hdpi/notificationicon.png
-convert drawable-xxxhdpi/notificationicon.png -resize 24x24 drawable-mdpi/notificationicon.png
+#!/bin/sh
+
+ICON_SOURCE="app/platform/android/res/drawable-xxxhdpi/notificationicon.png"
+if [ -f "$ICON_SOURCE" ]; then
+	mkdir -p "app/platform/android/res/drawable-xxhdpi"
+	mkdir -p "app/platform/android/res/drawable-xhdpi"
+	mkdir -p "app/platform/android/res/drawable-hdpi"
+	mkdir -p "app/platform/android/res/drawable-mdpi"
+	convert "$ICON_SOURCE" -resize 72x72 "app/platform/android/res/drawable-xxhdpi/notificationicon.png"
+	convert "$ICON_SOURCE" -resize 48x48 "app/platform/android/res/drawable-xhdpi/notificationicon.png"
+	convert "$ICON_SOURCE" -resize 36x36 "app/platform/android/res/drawable-hdpi/notificationicon.png"
+	convert "$ICON_SOURCE" -resize 24x24 "app/platform/android/res/drawable-mdpi/notificationicon.png"
+else
+	echo "No notificationicon.png found"
+fi
 ```
 
 ## Send the notification from your server

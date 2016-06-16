@@ -15,3 +15,4 @@ name: ti.goosh
 moduleid: ti.goosh
 guid: 5ad17cbc-1fed-4f20-8f27-6d1baa49ea9f
 platform: android
+minsdk: 4.0.0.GA
