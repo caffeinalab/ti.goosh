@@ -236,7 +236,7 @@ public class IntentService extends GcmListenerService {
 		}
 
 		if (TiGooshModule.getInstance() != null) {
-			TiGooshModule.getInstance().sendMessage(jsonData, !appInBackground);
+			TiGooshModule.getInstance().sendMessage(jsonData, appInBackground);
 		}
 	}
 

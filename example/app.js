@@ -6,7 +6,6 @@ TiGoosh.registerForPushNotifications({
     callback: function(e) {
 
         var data = JSON.parse(e.data || '');
-        var notification = JSON.parse(e.notification || '');
 
     },
 
