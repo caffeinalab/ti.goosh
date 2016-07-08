@@ -25,12 +25,13 @@ public class RegistrationIntentService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+
 		try {
 
 			String senderId = TiGooshModule.getInstance().getSenderId();
 			Log.i(LCAT, "Sender ID: " + senderId);
 
-			String token = InstanceID.getInstance(this).getToken(TiGooshModule.getInstance().getSenderId(), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+			String token = InstanceID.getInstance(this).getToken(senderId, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 			Log.i(LCAT, "Device Token: " + token);
 
 			TiGooshModule.getInstance().sendSuccess(token);

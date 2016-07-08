@@ -24,6 +24,9 @@ import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.TiConfig;
 import org.appcelerator.titanium.TiApplication;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -39,8 +42,6 @@ public class TiGooshModule extends KrollModule {
 	private KrollFunction errorCallback = null;
 	private KrollFunction messageCallback = null;
 
-	private String token = null;
-
 	public TiGooshModule() {
 		super();
 		instance = this;
@@ -53,6 +54,29 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
 		Log.d(LCAT, "onAppCreate " + app + " (" + (instance != null) + ")");
+	}
+
+	@Override
+	public void onPause(Activity activity) {
+		Log.d(LCAT, "onPause");
+		super.onPause(activity);
+	}
+
+	private static void parseIntent() {
+		try {
+
+			Intent intent = TiApplication.getInstance().getRootOrCurrentActivity().getIntent();
+
+			if (intent.hasExtra("tigoosh.notification")) {
+				Log.d(LCAT, "Intent has notification in its extra");
+				getInstance().sendMessage(intent.getStringExtra("tigoosh.notification"), true);
+			} else {
+				Log.d(LCAT, "No notification in Intent");
+			}
+
+		} catch (Exception ex) {
+			Log.e(LCAT, ex.getMessage());
+		}
 	}
 
 	private boolean checkPlayServices() {
@@ -84,14 +108,7 @@ public class TiGooshModule extends KrollModule {
 		errorCallback = options.containsKey("error") ? (KrollFunction)options.get("error") : null;
 		messageCallback = options.containsKey("callback") ? (KrollFunction)options.get("callback") : null;
 
-		// Send old notification if present
-		Intent intent = TiApplication.getInstance().getRootOrCurrentActivity().getIntent();
-		if (intent.hasExtra("tigoosh.notification")) {
-			Log.d(LCAT, "Intent has notification in its extra");
-			sendMessage(intent.getStringExtra("tigoosh.notification"), true);
-		} else {
-			Log.d(LCAT, "No notification in Intent");
-		}
+		parseIntent();
 
 		if (checkPlayServices()) {
 			activity.startService( new Intent(activity, RegistrationIntentService.class) );
@@ -106,13 +123,13 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	@Kroll.getProperty
 	public Boolean isRemoteNotificationsEnabled() {
-		return token != null;
+		return this.getDefaultSharedPreferences().contains("tigoosh.token");
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
 	public String getRemoteDeviceUUID() {
-		return token;
+		return this.getDefaultSharedPreferences().getString("tigoosh.token", "");
 	}
 
 	@Kroll.method
@@ -125,13 +142,25 @@ public class TiGooshModule extends KrollModule {
 		return 0;
 	}
 
-	public void sendSuccess(String _token) {
-		token = _token;
 
+	// Private
+
+	public SharedPreferences getDefaultSharedPreferences() {
+		return PreferenceManager.getDefaultSharedPreferences(TiApplication.getInstance().getApplicationContext());
+	}
+
+	public void saveToken(String token) {
+		this.getDefaultSharedPreferences().edit().putString("tigoosh.token", token).apply();
+	}
+ 
+
+	public void sendSuccess(String token) {
 		if (successCallback == null) {
 			Log.e(LCAT, "sendSuccess invoked but no successCallback defined");
 			return;
 		}
+
+		this.saveToken(token);
 
 		HashMap<String, Object> e = new HashMap<String, Object>();
 		e.put("deviceToken", token);
