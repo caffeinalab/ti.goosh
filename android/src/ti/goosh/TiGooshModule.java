@@ -42,6 +42,8 @@ public class TiGooshModule extends KrollModule {
 	private KrollFunction errorCallback = null;
 	private KrollFunction messageCallback = null;
 
+	public Boolean registered = false;
+
 	public TiGooshModule() {
 		super();
 		instance = this;
@@ -53,27 +55,21 @@ public class TiGooshModule extends KrollModule {
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
+		// Register the events to ensure the Intent parsing on resume
+		TiApplication.getInstance().registerActivityLifecycleCallbacks(new TiGooshActivityLifecycleCallbacks());
 		Log.d(LCAT, "onAppCreate " + app + " (" + (instance != null) + ")");
 	}
 
-	@Override
-	public void onPause(Activity activity) {
-		Log.d(LCAT, "onPause");
-		super.onPause(activity);
-	}
-
-	private static void parseIntent() {
+	public void parseIncomingNotificationIntent() {
 		try {
-
-			Intent intent = TiApplication.getInstance().getRootOrCurrentActivity().getIntent();
+			Intent intent = TiApplication.getAppRootOrCurrentActivity().getIntent();
 
 			if (intent.hasExtra("tigoosh.notification")) {
-				Log.d(LCAT, "Intent has notification in its extra");
 				getInstance().sendMessage(intent.getStringExtra("tigoosh.notification"), true);
+				intent.removeExtra("tigoosh.notification");
 			} else {
 				Log.d(LCAT, "No notification in Intent");
 			}
-
 		} catch (Exception ex) {
 			Log.e(LCAT, ex.getMessage());
 		}
@@ -108,7 +104,8 @@ public class TiGooshModule extends KrollModule {
 		errorCallback = options.containsKey("error") ? (KrollFunction)options.get("error") : null;
 		messageCallback = options.containsKey("callback") ? (KrollFunction)options.get("callback") : null;
 
-		parseIntent();
+		this.registered = true;
+		this.parseIncomingNotificationIntent();
 
 		if (checkPlayServices()) {
 			activity.startService( new Intent(activity, RegistrationIntentService.class) );

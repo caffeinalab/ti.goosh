@@ -109,9 +109,18 @@ public class IntentService extends GcmListenerService {
 
 		if (showNotification) {
 
-			Intent launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-			launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-			launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+			// If the Application has a current activity, relaunch it
+			// otherwise, we need a LaunchIntent
+			Intent launcherIntent = null;
+			if (TiApplication.getAppRootOrCurrentActivity() == null) {
+				launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+				launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			} else {
+				launcherIntent = TiApplication.getAppRootOrCurrentActivity().getIntent();
+			}
+
 			launcherIntent.putExtra("tigoosh.notification", jsonData);
 
 			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
