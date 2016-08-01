@@ -1,6 +1,6 @@
 <img src="logo.jpg" />
 
-### Android Titanium module to work easily with Google Cloud Messaging push notification service... and it's Parse and Parse Server compatible!
+#### Android Titanium module to work easily with Google Cloud Messaging push notification service... and it's Parse and Parse Server compatible!
 
 ## Install the module
 
