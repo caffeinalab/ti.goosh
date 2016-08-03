@@ -28,6 +28,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
@@ -207,10 +208,31 @@ public class IntentService extends GcmListenerService {
 
 			try {
 				if (data.has("vibrate")) {
-					JsonPrimitive vibrate = data.getAsJsonPrimitive("vibrate");
-					if (vibrate.isBoolean() && vibrate.getAsBoolean() == true) {
-						builder_defaults |= Notification.DEFAULT_VIBRATE;
+					//JsonPrimitive vibrate = data.getAsJsonPrimitive("vibrate");
+					JsonElement vibrateJson = data.get("vibrate");
+
+					if(vibrateJson.isJsonPrimitive()) {
+						JsonPrimitive vibrate = vibrateJson.getAsJsonPrimitive();
+
+						if (vibrate.isBoolean() && vibrate.getAsBoolean() == true) {
+							builder_defaults |= Notification.DEFAULT_VIBRATE;
+						}
 					}
+					else if(vibrateJson.isJsonArray()) {
+						JsonArray vibrate = vibrateJson.getAsJsonArray();
+						
+						if(vibrate.size() > 0) {
+							long[] pattern = new long[vibrate.size()];
+							int i = 0;
+							
+							for(i = 0; i < vibrate.size(); i++) {
+								pattern[i] = vibrate.get(i).getAsLong();
+							}
+
+							builder.setVibrate(pattern);
+						}
+					}
+
 				}
 			} catch(Exception ex) {
 				Log.e(LCAT, "Vibrate exception: " + ex.getMessage());
