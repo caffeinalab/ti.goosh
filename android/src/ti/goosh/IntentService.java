@@ -232,16 +232,42 @@ public class IntentService extends GcmListenerService {
 							builder.setVibrate(pattern);
 						}
 					}
-
 				}
 			} catch(Exception ex) {
 				Log.e(LCAT, "Vibrate exception: " + ex.getMessage());
 			}
+			
+			// Lights
 
-			// Build
+			try {
+				if(data.has("lights"))
+				{
+					JsonElement lightsJson = data.get("lights");
 
-			builder_defaults |= Notification.DEFAULT_LIGHTS;
+					if(lightsJson.isJsonObject())
+					{
+						JsonObject lights = lightsJson.getAsJsonObject();
+						int argb = Color.parseColor(lights.get("argb").getAsString());
+						int onMs = lights.get("onMs").getAsInt();
+						int offMs = lights.get("offMs").getAsInt();
+
+						if(-1 != argb && -1 != onMs && -1 != offMs)
+						{
+							builder.setLights(argb, onMs, offMs);
+						}
+					}
+				}
+				else
+				{
+					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				}
+			} catch(Exception ex) {
+				Log.e(LCAT, "Lights exception: " + ex.getMessage());
+			}
+
 			builder.setDefaults(builder_defaults);
+			
+			// Build
 
 			// Tag
 
