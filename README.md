@@ -125,16 +125,29 @@ All properties must be wrapper with a `data` object.
 The payload of the notification is compatible with *Parse server*.
 
 Property | Type | Default | Description
---- | ---| --- | ----
+--- | --- | --- | ----
 alert | String | `null` | The message to show in the notification center and in the status bar. 
 title | String | The app name | The title to show in the notification center.
 vibrate | Boolean | `false` | Control the vibration of the phone.
+vibrate | Array | `null` | This property can also be an array with a pattern. When the notification is received the device will vibrate following that pattern
+lights | Object | `null` | This optional property sets the LED light color and frequency. Check out the property description below on how to send it
 badge | Number | `null` | The icon on the launchscreen will display this number on the right-top corner if supported.
 icon | String | The app small icon | A URL represting a large icon to show. 
 color | String | `null` | Background color of the notification icon
 tag | String | `null` | Tag of this notification.
 id | Number | `null` | ID of this notification.
 force_show_in_foreground | Boolean | `false` | Control if notification must be shown as alert even if app is in foreground.
+
+### Lights Object
+
+Property | Type | Default | Description
+--- | --- | --- | ----
+argb | String | `null` | [Required] an ARGB or RGB string of the color to set the LED light to. i.e. `#ff00ff` or `#50ff00ff`
+onMs | Number | `null` | [Required] The number of milliseconds you want the light to stay on
+offMs | Number | `null` | [Required] The number of milliseconds you want it to stay off. The light will loop between on and off
+
+If any of the above properties are missing, the device default color and frequency will be set
+
 
 Notes:
 
@@ -162,7 +175,12 @@ $json = '{
       "force_show_in_foreground": false,
       "data": {
 			"foo" : "bar"
-   	}
+   	},
+      "lights": {
+      	"argb": "#50ff00ff",
+      	"onMs": 50,
+      	"offMs": 50
+      }
     }
   }
 }';
