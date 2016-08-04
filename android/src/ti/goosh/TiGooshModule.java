@@ -67,17 +67,21 @@ public class TiGooshModule extends KrollModule {
 			Intent intent = root.getIntent();
 
 			if (intent.hasExtra("tigoosh.notification")) {
-
-				Window mainWindow = root.getWindow();
-				mainWindow.getDecorView().post(new Runnable(){
+				
+				Runnable postLayout = new Runnable(){
 					@Override
 					public void run() {
-						Activity root = TiApplication.getAppRootOrCurrentActivity();
-						Intent intent = root.getIntent();
-						TiGooshModule.getInstance().sendMessage(intent.getStringExtra("tigoosh.notification"), true);
-						intent.removeExtra("tigoosh.notification");
+						Intent intent = TiApplication.getAppRootOrCurrentActivity().getIntent();
+						//mainWindow.getDecorView().removeCallbacks(this);
+						//extra check so it is not called twice
+						if (intent.hasExtra("tigoosh.notification")) {
+							TiGooshModule.getInstance().sendMessage(intent.getStringExtra("tigoosh.notification"), true);
+							intent.removeExtra("tigoosh.notification");
+						}
 					}
-				});
+				};
+
+				root.runOnUiThread(postLayout);
 
 			} else {
 				Log.d(LCAT, "No notification in Intent");
