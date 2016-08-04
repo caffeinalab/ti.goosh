@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Window;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -62,11 +63,22 @@ public class TiGooshModule extends KrollModule {
 
 	public void parseIncomingNotificationIntent() {
 		try {
-			Intent intent = TiApplication.getAppRootOrCurrentActivity().getIntent();
+			Activity root = TiApplication.getAppRootOrCurrentActivity();
+			Intent intent = root.getIntent();
 
 			if (intent.hasExtra("tigoosh.notification")) {
-				getInstance().sendMessage(intent.getStringExtra("tigoosh.notification"), true);
-				intent.removeExtra("tigoosh.notification");
+
+				Window mainWindow = root.getWindow();
+				mainWindow.getDecorView().post(new Runnable(){
+					@Override
+					public void run() {
+						Activity root = TiApplication.getAppRootOrCurrentActivity();
+						Intent intent = root.getIntent();
+						TiGooshModule.getInstance().sendMessage(intent.getStringExtra("tigoosh.notification"), true);
+						intent.removeExtra("tigoosh.notification");
+					}
+				});
+
 			} else {
 				Log.d(LCAT, "No notification in Intent");
 			}
