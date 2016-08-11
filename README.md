@@ -69,6 +69,16 @@ TiGoosh.registerForPushNotifications({
 TiGoosh.unregisterForPushNotifications();
 ```
 
+## Usage with Trimethyl
+
+[Trimethyl](http://trimethyl.github.io/trimethyl/) uses this module for its *Notifications* library. [http://trimethyl.github.io/trimethyl/notifications.js.html#line155](http://trimethyl.github.io/trimethyl/notifications.js.html#line155), so you can just type:
+
+```js
+Notifications.subscribe();
+```
+
+to activate the notifications for both iOS / Android.
+
 ## Properties
 
 Property | Type | Description
