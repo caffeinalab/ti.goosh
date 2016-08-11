@@ -265,8 +265,118 @@ public class IntentService extends GcmListenerService {
 				Log.e(LCAT, "Lights exception: " + ex.getMessage());
 			}
 
+			// Ongoing
+
+			try {
+				if(data.has("ongoing"))
+				{
+					JsonElement ongoingJson = data.get("ongoing");
+
+					if(ongoingJson.isJsonPrimitive())
+					{
+						Boolean ongoing = ongoingJson.getAsBoolean();
+						
+						builder.setOngoing(ongoing);
+					}
+				}
+				else
+				{
+					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				}
+			} catch(Exception ex) {
+				Log.e(LCAT, "Ongoing exception: " + ex.getMessage());
+			}
+
+			// Group
+
+			try {
+				if(data.has("group"))
+				{
+					JsonElement groupJson = data.get("group");
+
+					if(groupJson.isJsonPrimitive())
+					{
+						String group = groupJson.getAsString();
+						
+						builder.setGroup(group);
+					}
+				}
+				else
+				{
+					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				}
+			} catch(Exception ex) {
+				Log.e(LCAT, "Group exception: " + ex.getMessage());
+			}
+
+			// GroupSummary
+
+			try {
+				if(data.has("group_summary"))
+				{
+					JsonElement groupsumJson = data.get("group_summary");
+
+					if(groupsumJson.isJsonPrimitive())
+					{
+						Boolean groupsum = groupsumJson.getAsBoolean();
+						
+						builder.setGroupSummary(groupsum);
+					}
+				}
+				else
+				{
+					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				}
+			} catch(Exception ex) {
+				Log.e(LCAT, "Group summary exception: " + ex.getMessage());
+			}
+
+			// When
+
+			try {
+				if(data.has("when"))
+				{
+					JsonElement whenJson = data.get("when");
+
+					if(whenJson.isJsonPrimitive())
+					{
+						int when = whenJson.getAsInt();
+						
+						builder.setWhen(when);
+					}
+				}
+				else
+				{
+					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				}
+			} catch(Exception ex) {
+				Log.e(LCAT, "When exception: " + ex.getMessage());
+			}
+
+			// Only alert once
+
+			try {
+				if(data.has("only_alert_once"))
+				{
+					JsonElement oaoJson = data.get("only_alert_once");
+
+					if(oaoJson.isJsonPrimitive())
+					{
+						Boolean oao = oaoJson.getAsBoolean();
+						
+						builder.setOnlyAlertOnce(oao);
+					}
+				}
+				else
+				{
+					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				}
+			} catch(Exception ex) {
+				Log.e(LCAT, "Only alert once exception: " + ex.getMessage());
+			}
+
 			builder.setDefaults(builder_defaults);
-			
+
 			// Build
 
 			// Tag

@@ -31,6 +31,10 @@ import android.preference.PreferenceManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import com.google.android.gms.gcm.GcmPubSub;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
+
 @Kroll.module(name="TiGoosh", id="ti.goosh")
 public class TiGooshModule extends KrollModule {
 
