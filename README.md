@@ -137,6 +137,11 @@ color | String | `null` | Background color of the notification icon
 tag | String | `null` | Tag of this notification.
 id | Number | `null` | ID of this notification.
 force_show_in_foreground | Boolean | `false` | Control if notification must be shown as alert even if app is in foreground.
+ongoing | Boolean | `false` | Set whether this is an ongoing notification.
+group | String | `null` | Set this notification to be part of a group of notifications sharing the same key. 
+group_summary | Boolean | `null` | Sets whether this notification is the main one for it's group
+when | Number | `null` | Set the time that the event occurred. Notifications in the panel are sorted by this time.
+only_alert_once | Boolean | `null` | Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.
 
 ### Lights Object
 
@@ -180,7 +185,12 @@ $json = '{
       	"argb": "#50ff00ff",
       	"onMs": 50,
       	"offMs": 50
-      }
+      },
+      "ongoing": false,
+      "group": 'groupA',
+      "group_summary": true,
+      "when": 1470058413,
+      "only_alert_once": true
     }
   }
 }';
