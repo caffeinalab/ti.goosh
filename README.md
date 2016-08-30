@@ -79,6 +79,12 @@ Notifications.subscribe();
 
 to activate the notifications for both iOS / Android.
 
+## Failed to run dexer
+
+If you have an error about the dexer, please first read this article [https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx](https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx).
+
+Otherwise, visit the `gps-jars` directory in this repository.
+
 ## Properties
 
 Property | Type | Description
