@@ -25,6 +25,18 @@ To get GCM sender ID:
 * Find your API project and click Project Name.
 * You can find Project Number. You will use it as the GCM sender ID.
 
+## Set the Google Play Services SDK version
+
+In your  `tiapp.xml`, in the node **android > manifest > application**, insert:
+
+```xml
+<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+```
+
+If you have an error at compile time, please first read this article to clarify your idea about this bug: [https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx](https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx).
+
+Once done, visit the `gps-jars` directory in this repository.
+
 ## Register for Push notifications
 
 We kept the same syntax of `Ti.Network` for iOS notifications, hope you like this choice :)
@@ -78,12 +90,6 @@ Notifications.subscribe();
 ```
 
 to activate the notifications for both iOS / Android.
-
-## Failed to run dexer
-
-If you have an error about the dexer, please first read this article [https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx](https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx).
-
-Otherwise, visit the `gps-jars` directory in this repository.
 
 ## Properties
 

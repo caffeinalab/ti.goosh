@@ -27,7 +27,7 @@ The structure of your `module/android` must be something like this:
 
 The second thing to do is to make sure that all modules reference the right version of the SDK.
 
-To do that, for each module, edit the `MODULE/platform/android/res/values/version.xml` file and be sure that the version is `8487000`.
+To do that, for each module, edit the `[MODULE]/platform/android/res/values/version.xml` file and be sure that the version is `8487000`.
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
