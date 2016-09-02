@@ -1,3 +1,6 @@
+**If you want to use Ti.Goosh with other Android modules, please read this**
+
+
 ### Dealing with multidex
 
 This directory contains some combinations of Google Play Services JARs files to use the module with other Titanium modules that uses Google Play Services too.
@@ -5,6 +8,8 @@ This directory contains some combinations of Google Play Services JARs files to 
 To clarify, read this blog post: [https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx](https://medium.com/all-titanium/deal-with-titanium-modules-and-its-missing-support-for-android-multidex-546de5486d13#.wfo7v4akx)
 
 For example, if you are using **Ti.Goosh** with **Ti.Map**, you have to download the `google-play-services-gcm+map.jar` and replace the GPS JAR file in the *lib* directory in both modules.
+
+*You have to REPLACE all Google Play services JAR, so delete the oldest one.**
 
 The structure of your `module/android` must be something like this:
 
