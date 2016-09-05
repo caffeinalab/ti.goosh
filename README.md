@@ -149,12 +149,12 @@ The payload of the notification is compatible with *Parse server*.
 Property | Type | Default | Description
 --- | --- | --- | ----
 alert | String | `null` | The message to show in the notification center and in the status bar. 
-title | String | The app name | The title to show in the notification center.
+title | String | App Title | The title to show in the notification center.
 vibrate | Boolean | `false` | Control the vibration of the phone.
 vibrate | Array | `null` | This property can also be an array with a pattern. When the notification is received the device will vibrate following that pattern
 lights | Object | `null` | This optional property sets the LED light color and frequency. Check out the property description below on how to send it
 badge | Number | `null` | The icon on the launchscreen will display this number on the right-top corner if supported.
-icon | String | The app small icon | A URL represting a large icon to show. 
+icon | String | `null` | A URL represting a large icon to show. 
 color | String | `null` | Background color of the notification icon
 tag | String | `null` | Tag of this notification.
 id | Number | `null` | ID of this notification.
