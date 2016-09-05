@@ -233,7 +233,17 @@ curl_close($ch);
 
 ## Handle the notification on the app
 
-The payload of the notifications is the same that comes from your server. You have to JSON parse the `data` object on the javascript side. The object passed in the `callback` contain also:
+The payload of the notifications is the same that comes from your server. 
+
+**NB: You have to parse the `data` object on the javascript side:** 
+
+```
+function(e) {
+	e.data = JSON.parse(e.data);
+}
+```
+
+The object passed in the `callback` contain also:
 
 #### inBackground
 
