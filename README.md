@@ -108,9 +108,11 @@ gcm.setAppBadge(2);
 
 ## Set the icon for the tray
 
-The module sets the notification tray icon taking it from `/platform/android/res/drawable-*`.
+The module sets the notification tray icon taking it from `/platform/android/res/drawable-*/notificationicon.png`.
 
-It should be flat (no gradients), white and face-on perspective. You have to generate the icon with all resolutions.
+It should be flat (no gradients), white and face-on perspective. 
+
+**NB: You have to generate the icon with all resolutions.**
 
 ```
 22 × 22 area in 24 × 24 (mdpi)
@@ -120,7 +122,7 @@ It should be flat (no gradients), white and face-on perspective. You have to gen
 88 × 88 area in 96 × 96 (xxxhdpi)
 ```
 
-You can use this script to generate it once you put the icon in `drawable-xxxhdpi/notificationicon.png`.
+You can use this script to generate it **once you put** the icon in `drawable-xxxhdpi/notificationicon.png`.
 
 ```sh
 #!/bin/sh
