@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 
+
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+
+import android.app.NotificationManager;
 
 @Kroll.module(name="TiGoosh", id="ti.goosh")
 public class TiGooshModule extends KrollModule {
@@ -99,6 +102,10 @@ public class TiGooshModule extends KrollModule {
 		return true;
 	}
 
+	private static NotificationManager getNotificationManager() {
+		return (NotificationManager) TiApplication.getInstance().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+	}
+
 	@Kroll.method
 	public String getSenderId() {
 		return TiApplication.getInstance().getAppProperties().getString("gcm.senderid", "");
@@ -123,6 +130,21 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	public void unregisterForPushNotifications() {
 		// TODO
+	}
+
+	@Kroll.method
+	public void cancelAll() {
+		getNotificationManager().cancelAll();
+	}
+
+	@Kroll.method
+	public void cancelWithTag(String tag, int id) {
+		getNotificationManager().cancel(tag, -1 * id);
+	}
+
+	@Kroll.method
+	public void cancel(int id) {
+		getNotificationManager().cancel(-1 * id);
 	}
 
 	@Kroll.method
