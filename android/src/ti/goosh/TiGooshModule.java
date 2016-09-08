@@ -145,15 +145,7 @@ public class TiGooshModule extends KrollModule {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-
-                	// InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
-                	// Using deleteInstanceID because using deleteToken throws a compilation error
-                	// "cannot find symbol" InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
-                	//                                                     ^
-                	// symbol:   method deleteToken(String,String)
-                	// location: class InstanceID
-
-                	InstanceID.getInstance(context).deleteInstanceID();
+                	InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
                     Log.d(LCAT, "delete instanceid succeeded.");
                 } catch (final IOException e) {
                     Log.e(LCAT, "remove token failed." + "\nsenderId: " + authorizedEntity + "\nerror: " + e.getMessage());
