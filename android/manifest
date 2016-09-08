@@ -2,11 +2,11 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 1.4.0
+version: 1.5.0
 apiversion: 2
 architectures: armeabi armeabi-v7a x86
 description: ti.goosh
-author: Flavio De Stefano, Ani Sinanaj
+author: Flavio De Stefano
 license: MIT
 copyright: Copyright (c) 2016 by Caffeina
 

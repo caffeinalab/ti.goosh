@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,6 +19,7 @@ import android.view.Window;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.IOException;
 
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.KrollFunction;
@@ -129,8 +131,37 @@ public class TiGooshModule extends KrollModule {
 
 	@Kroll.method
 	public void unregisterForPushNotifications() {
-		// TODO
+		String sender = TiApplication.getInstance().getAppProperties().getString("gcm.senderid", "");
+		Context c 	  = TiApplication.getInstance().getApplicationContext();
+
+		this.deleteTokenInBackground(sender, GoogleCloudMessaging.INSTANCE_ID_SCOPE, c);
 	}
+
+	/**
+     * Unregister in background by deleting the token
+     */
+    public void deleteTokenInBackground(final String authorizedEntity, final String scope, final Context context) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+
+                	// InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
+                	// Using deleteInstanceID because using deleteToken throws a compilation error
+                	// "cannot find symbol" InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
+                	//                                                     ^
+                	// symbol:   method deleteToken(String,String)
+                	// location: class InstanceID
+
+                	InstanceID.getInstance(context).deleteInstanceID();
+                    Log.d(LCAT, "delete instanceid succeeded.");
+                } catch (final IOException e) {
+                    Log.e(LCAT, "remove token failed." + "\nsenderId: " + authorizedEntity + "\nerror: " + e.getMessage());
+                }
+                return null;
+            }
+        }.execute();
+    }
 
 	@Kroll.method
 	public void cancelAll() {
