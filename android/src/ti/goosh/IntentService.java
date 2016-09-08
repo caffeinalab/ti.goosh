@@ -312,8 +312,6 @@ public class IntentService extends GcmListenerService {
 						String group = groupJson.getAsString();
 						
 						builder.setGroup(group);
-
-						Log.e(LCAT, "Set Group Success");
 					}
 				}
 				else
@@ -336,8 +334,6 @@ public class IntentService extends GcmListenerService {
 						Boolean groupsum = groupsumJson.getAsBoolean();
 						
 						builder.setGroupSummary(groupsum);
-
-						Log.e(LCAT, "Set GroupSumarry Success: ");
 					}
 				}
 				else
