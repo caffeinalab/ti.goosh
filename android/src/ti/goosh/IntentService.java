@@ -143,6 +143,20 @@ public class IntentService extends GcmListenerService {
 				builder.setTicker(alert);
 			}
 
+			// BigText
+
+			String big_text = null;
+			if (data.has("big_text")) {
+				NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+				bigTextStyle.bigText( data.getAsJsonPrimitive("big_text").getAsString() );
+
+				if (data.has("big_text_summary")) {
+					bigTextStyle.setSummaryText( data.getAsJsonPrimitive("big_text_summary").getAsString() );
+				}
+
+				builder.setStyle(bigTextStyle);
+			}
+
 			// Icons
 
 			try {
@@ -155,7 +169,6 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Large icon
-
 			if (data.has("icon")) {
 				try {
 					Bitmap icon = this.getBitmapFromURL( data.getAsJsonPrimitive("icon").getAsString() );
@@ -299,6 +312,8 @@ public class IntentService extends GcmListenerService {
 						String group = groupJson.getAsString();
 						
 						builder.setGroup(group);
+
+						Log.e(LCAT, "Set Group Success");
 					}
 				}
 				else
@@ -321,6 +336,8 @@ public class IntentService extends GcmListenerService {
 						Boolean groupsum = groupsumJson.getAsBoolean();
 						
 						builder.setGroupSummary(groupsum);
+
+						Log.e(LCAT, "Set GroupSumarry Success: ");
 					}
 				}
 				else
