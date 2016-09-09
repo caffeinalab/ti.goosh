@@ -137,23 +137,20 @@ public class TiGooshModule extends KrollModule {
 		this.deleteTokenInBackground(sender, GoogleCloudMessaging.INSTANCE_ID_SCOPE, c);
 	}
 
-	/**
-     * Unregister in background by deleting the token
-     */
-    public void deleteTokenInBackground(final String authorizedEntity, final String scope, final Context context) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                	InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
-                    Log.d(LCAT, "delete instanceid succeeded.");
-                } catch (final IOException e) {
-                    Log.e(LCAT, "remove token failed." + "\nsenderId: " + authorizedEntity + "\nerror: " + e.getMessage());
-                }
-                return null;
-            }
-        }.execute();
-    }
+	private void deleteTokenInBackground(final String authorizedEntity, final String scope, final Context context) {
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
+					Log.d(LCAT, "delete instanceid succeeded");
+				} catch (final IOException e) {
+					Log.e(LCAT, "remove token failed" + "senderId: " + authorizedEntity + "\nerror: " + e.getMessage());
+				}
+				return null;
+			}
+		}.execute();
+	}
 
 	@Kroll.method
 	public void cancelAll() {

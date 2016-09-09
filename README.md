@@ -75,8 +75,6 @@ TiGoosh.registerForPushNotifications({
 
 ## Unregister
 
-*Not currently implemented*
-
 ```js
 TiGoosh.unregisterForPushNotifications();
 ```
@@ -107,17 +105,21 @@ gcm.setAppBadge(2);
 ```
 
 ## Cancel received notification
+
 Cancel all notifications
+
 ```
 TiGoosh.cancelAll();
 ```
 
 Cancel notification By id
+
 ```
 TiGoosh.cancel(int id);
 ```
 
 Cancel notification with tag and id
+
 ```
 TiGoosh.cancelWithTag(String tag, int id);
 ```
