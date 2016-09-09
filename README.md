@@ -106,6 +106,22 @@ remoteDeviceUUID | String | Get the device token previously obtained.
 gcm.setAppBadge(2);
 ```
 
+## Cancel received notification
+Cancel all notifications
+```
+TiGoosh.cancelAll();
+```
+
+Cancel notification By id
+```
+TiGoosh.cancel(int id);
+```
+
+Cancel notification with tag and id
+```
+TiGoosh.cancelWithTag(String tag, int id);
+```
+
 ## Set the icon for the tray
 
 The module sets the notification tray icon taking it from `/platform/android/res/drawable-*/notificationicon.png`.
@@ -166,6 +182,8 @@ group | String | `null` | Set this notification to be part of a group of notific
 group_summary | Boolean | `null` | Sets whether this notification is the main one for it's group
 when | Number | `null` | Set the time that the event occurred. Notifications in the panel are sorted by this time.
 only_alert_once | Boolean | `null` | Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.
+big_text | String | `null` | The longer text to be displayed in the big form of the template in place of the content text.
+big_text_summary | String | `null` | The first line of text after the detail section in the big form of the template.
 
 ### Lights Object
 
