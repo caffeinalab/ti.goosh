@@ -17,6 +17,7 @@ import android.view.Window;
 
 
 import java.lang.reflect.Type;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
@@ -39,6 +40,14 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import android.app.NotificationManager;
+import android.service.notification.StatusBarNotification;
+import android.app.PendingIntent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 @Kroll.module(name="TiGoosh", id="ti.goosh")
 public class TiGooshModule extends KrollModule {
@@ -61,13 +70,6 @@ public class TiGooshModule extends KrollModule {
 
 	public static TiGooshModule getInstance() {
 		return instance;
-	}
-
-	@Kroll.onAppCreate
-	public static void onAppCreate(TiApplication app) {
-		// Register the events to ensure the Intent parsing on resume
-		TiApplication.getInstance().registerActivityLifecycleCallbacks(new TiGooshActivityLifecycleCallbacks());
-		Log.d(LCAT, "onAppCreate " + app + " (" + (instance != null) + ")");
 	}
 
 	public void parseIncomingNotificationIntent() {
@@ -106,6 +108,15 @@ public class TiGooshModule extends KrollModule {
 
 	private static NotificationManager getNotificationManager() {
 		return (NotificationManager) TiApplication.getInstance().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+	}
+
+	private static Intent getIntent(PendingIntent pendingIntent) {
+		try {
+			Method getIntent = PendingIntent.class.getDeclaredMethod("getIntent");
+			return (Intent) getIntent.invoke(pendingIntent);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Kroll.method
@@ -162,6 +173,16 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	public void cancel(int id) {
 		getNotificationManager().cancel(-1 * id);
+	}
+
+	@Kroll.method
+	public Object getActiveNotifications()  throws JSONException {
+		ArrayList<Object> list = new ArrayList<Object>();
+		for (StatusBarNotification sbn : getNotificationManager().getActiveNotifications()){
+			JSONObject jsonObject = new JSONObject(getIntent(sbn.getNotification().contentIntent).getStringExtra("tigoosh.notification"));
+			list.add(jsonToMap(jsonObject));
+		}
+		return list.toArray();
 	}
 
 	@Kroll.method
@@ -232,7 +253,8 @@ public class TiGooshModule extends KrollModule {
 		try {
 		
 			HashMap<String, Object> e = new HashMap<String, Object>();
-			e.put("data", data); // to parse on reverse on JS side
+			JSONObject jsonObject = new JSONObject(data);
+			e.put("data", jsonToMap(jsonObject));
 			e.put("inBackground", inBackground);
 
 			messageCallback.callAsync(getKrollObject(), e);
@@ -240,6 +262,51 @@ public class TiGooshModule extends KrollModule {
 		} catch (Exception ex) {
 			Log.e(LCAT, "Error sending gmessage to JS: " + ex.getMessage());
 		}
+	}
+
+	public static Map<String, Object> jsonToMap(JSONObject json) throws JSONException {
+	    Map<String, Object> retMap = new HashMap<String, Object>();
+
+	    if(json != JSONObject.NULL) {
+	        retMap = toMap(json);
+	    }
+	    return retMap;
+	}
+
+	public static Map<String, Object> toMap(JSONObject object) throws JSONException {
+	    Map<String, Object> map = new HashMap<String, Object>();
+
+	    Iterator<String> keysItr = object.keys();
+	    while(keysItr.hasNext()) {
+	        String key = keysItr.next();
+	        Object value = object.get(key);
+
+	        if(value instanceof JSONArray) {
+	            value = toList((JSONArray) value);
+	        }
+
+	        else if(value instanceof JSONObject) {
+	            value = toMap((JSONObject) value);
+	        }
+	        map.put(key, value);
+	    }
+	    return map;
+	}
+
+	public static List<Object> toList(JSONArray array) throws JSONException {
+	    List<Object> list = new ArrayList<Object>();
+	    for(int i = 0; i < array.length(); i++) {
+	        Object value = array.get(i);
+	        if(value instanceof JSONArray) {
+	            value = toList((JSONArray) value);
+	        }
+
+	        else if(value instanceof JSONObject) {
+	            value = toMap((JSONObject) value);
+	        }
+	        list.add(value);
+	    }
+	    return list;
 	}
 
 }

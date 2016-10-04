@@ -99,6 +99,7 @@ public class IntentService extends GcmListenerService {
 				if (data.has("force_show_in_foreground")) {
 					JsonPrimitive showInFore = data.getAsJsonPrimitive("force_show_in_foreground");
 					showNotification = ((showInFore.isBoolean() && showInFore.getAsBoolean() == true));
+					appInBackground = showNotification;
 				} else {
 					showNotification = false;
 				}
@@ -110,21 +111,14 @@ public class IntentService extends GcmListenerService {
 
 		if (showNotification) {
 
-
-			// If the Application has a current activity, relaunch it
-			// otherwise, we need a LaunchIntent
-			Intent launcherIntent = null;
-			if (TiApplication.getAppRootOrCurrentActivity() == null) {
-				launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-				launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-				launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-			} else {
-				launcherIntent = TiApplication.getAppRootOrCurrentActivity().getIntent();
-			}
-
+			// LaunchIntent
+			Intent launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+			launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			launcherIntent.setAction(Long.toString(System.currentTimeMillis()));
 			launcherIntent.putExtra("tigoosh.notification", jsonData);
 
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, (int) bundle.getLong("google.sent_time"), launcherIntent, PendingIntent.FLAG_ONE_SHOT);
 
 			// Start building notification
 
