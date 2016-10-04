@@ -121,8 +121,8 @@ public class TiGooshModule extends KrollModule {
 		errorCallback = options.containsKey("error") ? (KrollFunction)options.get("error") : null;
 		messageCallback = options.containsKey("callback") ? (KrollFunction)options.get("callback") : null;
 
-		this.registered = true;
-		this.parseIncomingNotificationIntent();
+		registered = true;
+		parseIncomingNotificationIntent();
 
 		if (checkPlayServices()) {
 			activity.startService( new Intent(activity, RegistrationIntentService.class) );
@@ -131,26 +131,23 @@ public class TiGooshModule extends KrollModule {
 
 	@Kroll.method
 	public void unregisterForPushNotifications() {
-		String sender = TiApplication.getInstance().getAppProperties().getString("gcm.senderid", "");
-		Context c 	  = TiApplication.getInstance().getApplicationContext();
+		String senderId = getSenderId();
+		Context context = TiApplication.getInstance().getApplicationContext();
 
-		this.deleteTokenInBackground(sender, GoogleCloudMessaging.INSTANCE_ID_SCOPE, c);
-	}
-
-	private void deleteTokenInBackground(final String authorizedEntity, final String scope, final Context context) {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					InstanceID.getInstance(context).deleteToken(authorizedEntity, scope);
+					InstanceID.getInstance(context).deleteToken(senderId, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
 					Log.d(LCAT, "delete instanceid succeeded");
 				} catch (final IOException e) {
-					Log.e(LCAT, "remove token failed" + "senderId: " + authorizedEntity + "\nerror: " + e.getMessage());
+					Log.e(LCAT, "remove token failed - error: " + e.getMessage());
 				}
 				return null;
 			}
 		}.execute();
 	}
+
 
 	@Kroll.method
 	public void cancelAll() {
@@ -170,13 +167,13 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	@Kroll.getProperty
 	public Boolean isRemoteNotificationsEnabled() {
-		return this.getDefaultSharedPreferences().contains("tigoosh.token");
+		return getDefaultSharedPreferences().contains("tigoosh.token");
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
 	public String getRemoteDeviceUUID() {
-		return this.getDefaultSharedPreferences().getString("tigoosh.token", "");
+		return getDefaultSharedPreferences().getString("tigoosh.token", "");
 	}
 
 	@Kroll.method
@@ -189,17 +186,17 @@ public class TiGooshModule extends KrollModule {
 		return 0;
 	}
 
+	// Privates
 
-	// Private
-
-	public SharedPreferences getDefaultSharedPreferences() {
+	private SharedPreferences getDefaultSharedPreferences() {
 		return PreferenceManager.getDefaultSharedPreferences(TiApplication.getInstance().getApplicationContext());
 	}
 
-	public void saveToken(String token) {
-		this.getDefaultSharedPreferences().edit().putString("tigoosh.token", token).apply();
+	private void saveToken(String token) {
+		getDefaultSharedPreferences().edit().putString("tigoosh.token", token).apply();
 	}
- 
+
+	// Public
 
 	public void sendSuccess(String token) {
 		if (successCallback == null) {
@@ -207,7 +204,7 @@ public class TiGooshModule extends KrollModule {
 			return;
 		}
 
-		this.saveToken(token);
+		saveToken(token);
 
 		HashMap<String, Object> e = new HashMap<String, Object>();
 		e.put("deviceToken", token);
@@ -233,6 +230,7 @@ public class TiGooshModule extends KrollModule {
 		}
 
 		try {
+		
 			HashMap<String, Object> e = new HashMap<String, Object>();
 			e.put("data", data); // to parse on reverse on JS side
 			e.put("inBackground", inBackground);
