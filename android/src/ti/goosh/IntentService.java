@@ -230,8 +230,7 @@ public class IntentService extends GcmListenerService {
 						if (vibrate.isBoolean() && vibrate.getAsBoolean() == true) {
 							builder_defaults |= Notification.DEFAULT_VIBRATE;
 						}
-					}
-					else if (vibrateJson.isJsonArray()) {
+					} else if (vibrateJson.isJsonArray()) {
 						JsonArray vibrate = vibrateJson.getAsJsonArray();
 						
 						if (vibrate.size() > 0) {
@@ -253,25 +252,20 @@ public class IntentService extends GcmListenerService {
 			// Lights
 
 			try {
-				if (data.has("lights"))
-				{
+				if (data.has("lights")) {
 					JsonElement lightsJson = data.get("lights");
 
-					if (lightsJson.isJsonObject())
-					{
+					if (lightsJson.isJsonObject()) {
 						JsonObject lights = lightsJson.getAsJsonObject();
 						int argb = Color.parseColor(lights.get("argb").getAsString());
 						int onMs = lights.get("onMs").getAsInt();
 						int offMs = lights.get("offMs").getAsInt();
 
-						if (-1 != argb && -1 != onMs && -1 != offMs)
-						{
+						if (-1 != argb && -1 != onMs && -1 != offMs) {
 							builder.setLights(argb, onMs, offMs);
 						}
 					}
-				}
-				else
-				{
+				} else {
 					builder_defaults |= Notification.DEFAULT_LIGHTS;
 				}
 			} catch(Exception ex) {
@@ -281,19 +275,14 @@ public class IntentService extends GcmListenerService {
 			// Ongoing
 
 			try {
-				if (data.has("ongoing"))
-				{
+				if (data.has("ongoing")) {
 					JsonElement ongoingJson = data.get("ongoing");
 
-					if (ongoingJson.isJsonPrimitive())
-					{
+					if (ongoingJson.isJsonPrimitive()) {
 						Boolean ongoing = ongoingJson.getAsBoolean();
-						
 						builder.setOngoing(ongoing);
 					}
-				}
-				else
-				{
+				} else {
 					builder_defaults |= Notification.DEFAULT_LIGHTS;
 				}
 			} catch(Exception ex) {
@@ -303,19 +292,14 @@ public class IntentService extends GcmListenerService {
 			// Group
 
 			try {
-				if (data.has("group"))
-				{
+				if (data.has("group")) {
 					JsonElement groupJson = data.get("group");
 
-					if (groupJson.isJsonPrimitive())
-					{
+					if (groupJson.isJsonPrimitive()) {
 						String group = groupJson.getAsString();
-						
 						builder.setGroup(group);
 					}
-				}
-				else
-				{
+				} else {
 					builder_defaults |= Notification.DEFAULT_LIGHTS;
 				}
 			} catch(Exception ex) {
@@ -325,19 +309,14 @@ public class IntentService extends GcmListenerService {
 			// GroupSummary
 
 			try {
-				if (data.has("group_summary"))
-				{
+				if (data.has("group_summary")) {
 					JsonElement groupsumJson = data.get("group_summary");
 
-					if (groupsumJson.isJsonPrimitive())
-					{
+					if (groupsumJson.isJsonPrimitive()) {
 						Boolean groupsum = groupsumJson.getAsBoolean();
-						
 						builder.setGroupSummary(groupsum);
 					}
-				}
-				else
-				{
+				} else {
 					builder_defaults |= Notification.DEFAULT_LIGHTS;
 				}
 			} catch(Exception ex) {
@@ -347,19 +326,14 @@ public class IntentService extends GcmListenerService {
 			// When
 
 			try {
-				if (data.has("when"))
-				{
+				if (data.has("when")) {
 					JsonElement whenJson = data.get("when");
 
-					if (whenJson.isJsonPrimitive())
-					{
+					if (whenJson.isJsonPrimitive()) {
 						int when = whenJson.getAsInt();
-						
 						builder.setWhen(when);
 					}
-				}
-				else
-				{
+				} else {
 					builder_defaults |= Notification.DEFAULT_LIGHTS;
 				}
 			} catch(Exception ex) {
@@ -369,19 +343,14 @@ public class IntentService extends GcmListenerService {
 			// Only alert once
 
 			try {
-				if (data.has("only_alert_once"))
-				{
+				if (data.has("only_alert_once")) {
 					JsonElement oaoJson = data.get("only_alert_once");
 
-					if (oaoJson.isJsonPrimitive())
-					{
+					if (oaoJson.isJsonPrimitive()) {
 						Boolean oao = oaoJson.getAsBoolean();
-						
 						builder.setOnlyAlertOnce(oao);
 					}
-				}
-				else
-				{
+				} else {
 					builder_defaults |= Notification.DEFAULT_LIGHTS;
 				}
 			} catch(Exception ex) {
@@ -390,7 +359,6 @@ public class IntentService extends GcmListenerService {
 
 			builder.setDefaults(builder_defaults);
 
-			// Build
 
 			// Tag
 
