@@ -179,7 +179,6 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Color
-
 			if (data.has("color")) {
 				try {
 					int color = Color.parseColor( data.getAsJsonPrimitive("color").getAsString() );
@@ -190,7 +189,6 @@ public class IntentService extends GcmListenerService {
 			}			
 
 			// Title
-
 			if (data.has("title")) {
 				builder.setContentTitle( data.getAsJsonPrimitive("title").getAsString() );
 			} else {
@@ -198,7 +196,6 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Badge
-
 			if (data.has("badge")) {
 				int badge = data.getAsJsonPrimitive("badge").getAsInt();
 				BadgeUtils.setBadge(context, badge);
@@ -206,7 +203,6 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Sound 
-
 			if (data.has("sound")) {
 				JsonPrimitive sound = data.getAsJsonPrimitive("sound");
 				if ( ("default".equals(sound.getAsString())) || (sound.isBoolean() && sound.getAsBoolean() == true) ) {
@@ -218,10 +214,8 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Vibration
-
-			try {
-				if (data.has("vibrate")) {
-					//JsonPrimitive vibrate = data.getAsJsonPrimitive("vibrate");
+			if (data.has("vibrate")) {
+				try {
 					JsonElement vibrateJson = data.get("vibrate");
 
 					if (vibrateJson.isJsonPrimitive()) {
@@ -244,15 +238,15 @@ public class IntentService extends GcmListenerService {
 							builder.setVibrate(pattern);
 						}
 					}
+				} catch(Exception ex) {
+					Log.e(LCAT, "Vibrate exception: " + ex.getMessage());
 				}
-			} catch(Exception ex) {
-				Log.e(LCAT, "Vibrate exception: " + ex.getMessage());
 			}
 			
+			
 			// Lights
-
-			try {
-				if (data.has("lights")) {
+			if (data.has("lights")) {
+				try {
 					JsonElement lightsJson = data.get("lights");
 
 					if (lightsJson.isJsonObject()) {
@@ -265,110 +259,109 @@ public class IntentService extends GcmListenerService {
 							builder.setLights(argb, onMs, offMs);
 						}
 					}
-				} else {
-					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				} catch(Exception ex) {
+					Log.e(LCAT, "Lights exception: " + ex.getMessage());
 				}
-			} catch(Exception ex) {
-				Log.e(LCAT, "Lights exception: " + ex.getMessage());
+			} else {
+				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
+			
 
 			// Ongoing
-
-			try {
-				if (data.has("ongoing")) {
+			if (data.has("ongoing")) {
+				try {
 					JsonElement ongoingJson = data.get("ongoing");
 
 					if (ongoingJson.isJsonPrimitive()) {
 						Boolean ongoing = ongoingJson.getAsBoolean();
 						builder.setOngoing(ongoing);
 					}
-				} else {
-					builder_defaults |= Notification.DEFAULT_LIGHTS;
+
+				} catch(Exception ex) {
+					Log.e(LCAT, "Ongoing exception: " + ex.getMessage());
 				}
-			} catch(Exception ex) {
-				Log.e(LCAT, "Ongoing exception: " + ex.getMessage());
+			} else {
+				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
 
 			// Group
-
-			try {
-				if (data.has("group")) {
+			if (data.has("group")) {
+				try {
 					JsonElement groupJson = data.get("group");
 
 					if (groupJson.isJsonPrimitive()) {
 						String group = groupJson.getAsString();
 						builder.setGroup(group);
 					}
-				} else {
-					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				} catch(Exception ex) {
+					Log.e(LCAT, "Group exception: " + ex.getMessage());
 				}
-			} catch(Exception ex) {
-				Log.e(LCAT, "Group exception: " + ex.getMessage());
+			} else {
+				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
+			
 
 			// GroupSummary
-
-			try {
-				if (data.has("group_summary")) {
+			if (data.has("group_summary")) {
+				try {
 					JsonElement groupsumJson = data.get("group_summary");
 
 					if (groupsumJson.isJsonPrimitive()) {
 						Boolean groupsum = groupsumJson.getAsBoolean();
 						builder.setGroupSummary(groupsum);
 					}
-				} else {
-					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				} catch(Exception ex) {
+					Log.e(LCAT, "Group summary exception: " + ex.getMessage());
 				}
-			} catch(Exception ex) {
-				Log.e(LCAT, "Group summary exception: " + ex.getMessage());
+			} else {
+				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
+			
 
 			// When
-
-			try {
-				if (data.has("when")) {
+			if (data.has("when")) {
+				try {
 					JsonElement whenJson = data.get("when");
 
 					if (whenJson.isJsonPrimitive()) {
 						int when = whenJson.getAsInt();
 						builder.setWhen(when);
 					}
-				} else {
-					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				} catch(Exception ex) {
+					Log.e(LCAT, "When exception: " + ex.getMessage());
 				}
-			} catch(Exception ex) {
-				Log.e(LCAT, "When exception: " + ex.getMessage());
+			} else {
+				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
+			
 
 			// Only alert once
-
-			try {
-				if (data.has("only_alert_once")) {
+			if (data.has("only_alert_once")) {
+				try {
 					JsonElement oaoJson = data.get("only_alert_once");
 
 					if (oaoJson.isJsonPrimitive()) {
 						Boolean oao = oaoJson.getAsBoolean();
 						builder.setOnlyAlertOnce(oao);
 					}
-				} else {
-					builder_defaults |= Notification.DEFAULT_LIGHTS;
+				} catch(Exception ex) {
+					Log.e(LCAT, "Only alert once exception: " + ex.getMessage());
 				}
-			} catch(Exception ex) {
-				Log.e(LCAT, "Only alert once exception: " + ex.getMessage());
+			} else {
+				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
-
+			
+			// Builder defaults OR
 			builder.setDefaults(builder_defaults);
 
 
 			// Tag
-
 			String tag = null;
 			if (data.has("tag")) {
 				tag = data.getAsJsonPrimitive("tag").getAsString();
 			}
-		
+
 			// Nid
-			
 			int id = 0;
 			if (data.has("id")) {
 				// ensure that the id sent from the server is negative to prevent
@@ -378,7 +371,7 @@ public class IntentService extends GcmListenerService {
 				id = atomic.getAndIncrement();
 			}
 
-
+			// Send
 			NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(tag, id, builder.build());
 		}
