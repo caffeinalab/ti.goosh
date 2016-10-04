@@ -10,6 +10,7 @@ import java.io.BufferedInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.lang.reflect.Type;
 import java.lang.Math;
+import java.util.Random;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -77,7 +78,7 @@ public class IntentService extends GcmListenerService {
 	}
 
 	private void parseNotification(Bundle bundle) {
-		Context context = TiApplication.getInstance().getApplicationContext();
+		Context context = getApplicationContext();
 		Boolean appInBackground = !TiApplication.isCurrentActivityInForeground();
 
 		Boolean showNotification = true;
@@ -110,21 +111,11 @@ public class IntentService extends GcmListenerService {
 
 		if (showNotification) {
 
+			Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
+			notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			notificationIntent.putExtra(TiGooshModule.INTENT_EXTRA, jsonData);
 
-			// If the Application has a current activity, relaunch it
-			// otherwise, we need a LaunchIntent
-			Intent launcherIntent = null;
-			if (TiApplication.getAppRootOrCurrentActivity() == null) {
-				launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-				launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-				launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-			} else {
-				launcherIntent = TiApplication.getAppRootOrCurrentActivity().getIntent();
-			}
-
-			launcherIntent.putExtra("tigoosh.notification", jsonData);
-
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, launcherIntent, PendingIntent.FLAG_ONE_SHOT);
+			PendingIntent contentIntent = PendingIntent.getActivity(this, new Random().nextInt(), notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
 			// Start building notification
 

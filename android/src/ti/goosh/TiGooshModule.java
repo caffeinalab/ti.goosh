@@ -46,6 +46,9 @@ public class TiGooshModule extends KrollModule {
 	private static final String LCAT = "ti.goosh.TiGooshModule";
 	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
+	public static final String INTENT_EXTRA = "tigoosh.notification";
+	public static final String TOKEN = "tigoosh.token";
+
 	private static TiGooshModule instance = null;
 
 	private KrollFunction successCallback = null;
@@ -63,22 +66,16 @@ public class TiGooshModule extends KrollModule {
 		return instance;
 	}
 
-	@Kroll.onAppCreate
-	public static void onAppCreate(TiApplication app) {
-		// Register the events to ensure the Intent parsing on resume
-		TiApplication.getInstance().registerActivityLifecycleCallbacks(new TiGooshActivityLifecycleCallbacks());
-		Log.d(LCAT, "onAppCreate " + app + " (" + (instance != null) + ")");
-	}
-
-	public void parseIncomingNotificationIntent() {
+	public void parseBootIntent() {
 		try {
-			Activity root = TiApplication.getAppRootOrCurrentActivity();
-			Intent intent = root.getIntent();
+			Intent intent = TiApplication.getAppRootOrCurrentActivity().getIntent();
 
-			if (intent.hasExtra("tigoosh.notification")) {
+			if (intent.hasExtra(INTENT_EXTRA)) {
 
-				TiGooshModule.getInstance().sendMessage(intent.getStringExtra("tigoosh.notification"), true);
-				intent.removeExtra("tigoosh.notification");
+				String notification = intent.getStringExtra(INTENT_EXTRA);
+
+				intent.removeExtra(INTENT_EXTRA);
+				instance.sendMessage(notification, true);
 
 			} else {
 				Log.d(LCAT, "No notification in Intent");
@@ -122,7 +119,7 @@ public class TiGooshModule extends KrollModule {
 		messageCallback = options.containsKey("callback") ? (KrollFunction)options.get("callback") : null;
 
 		registered = true;
-		parseIncomingNotificationIntent();
+		parseBootIntent();
 
 		if (checkPlayServices()) {
 			activity.startService( new Intent(activity, RegistrationIntentService.class) );
@@ -167,13 +164,13 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	@Kroll.getProperty
 	public Boolean isRemoteNotificationsEnabled() {
-		return getDefaultSharedPreferences().contains("tigoosh.token");
+		return getDefaultSharedPreferences().contains(TOKEN);
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
 	public String getRemoteDeviceUUID() {
-		return getDefaultSharedPreferences().getString("tigoosh.token", "");
+		return getDefaultSharedPreferences().getString(TOKEN, "");
 	}
 
 	@Kroll.method
@@ -193,7 +190,7 @@ public class TiGooshModule extends KrollModule {
 	}
 
 	private void saveToken(String token) {
-		getDefaultSharedPreferences().edit().putString("tigoosh.token", token).apply();
+		getDefaultSharedPreferences().edit().putString(TOKEN, token).apply();
 	}
 
 	// Public
@@ -230,7 +227,7 @@ public class TiGooshModule extends KrollModule {
 		}
 
 		try {
-		
+
 			HashMap<String, Object> e = new HashMap<String, Object>();
 			e.put("data", data); // to parse on reverse on JS side
 			e.put("inBackground", inBackground);

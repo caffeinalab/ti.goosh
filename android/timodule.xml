@@ -16,7 +16,6 @@
 			<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 			<uses-permission android:name="android.permission.USE_CREDENTIALS"/>
 			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
 			<!-- [END gcm_permission] -->
 
 			<application>
@@ -49,6 +48,11 @@
 					android:name="ti.goosh.RegistrationIntentService"
 					android:exported="false">
 				</service>
+	
+				<activity
+					android:name="ti.goosh.PushHandlerActivity"
+					android:exported="true">
+				</activity>
 
 			</application>
 
