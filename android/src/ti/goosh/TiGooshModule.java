@@ -235,7 +235,7 @@ public class TiGooshModule extends KrollModule {
 			e.put("data", data); // to parse on reverse on JS side
 			e.put("inBackground", inBackground);
 
-			messageCallback.call(getKrollObject(), e);
+			messageCallback.callAsync(getKrollObject(), e);
 
 		} catch (Exception ex) {
 			Log.e(LCAT, "Error sending gmessage to JS: " + ex.getMessage());
