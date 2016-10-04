@@ -131,8 +131,8 @@ public class TiGooshModule extends KrollModule {
 
 	@Kroll.method
 	public void unregisterForPushNotifications() {
-		String senderId = getSenderId();
-		Context context = TiApplication.getInstance().getApplicationContext();
+		final String senderId = getSenderId();
+		final Context context = TiApplication.getInstance().getApplicationContext();
 
 		new AsyncTask<Void, Void, Void>() {
 			@Override
