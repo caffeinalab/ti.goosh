@@ -107,6 +107,10 @@ public class IntentService extends GcmListenerService {
 		} else {
 			Log.i(LCAT, "Not showing notification cause missing data.alert");
 			showNotification = false;
+			if (data.has("badge")) {
+				int badge = data.getAsJsonPrimitive("badge").getAsInt();
+				BadgeUtils.setBadge(context, badge);
+			}
 		}
 
 		if (showNotification) {
