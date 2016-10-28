@@ -49,21 +49,21 @@ public class TiGooshModule extends KrollModule {
 	public static final String INTENT_EXTRA = "tigoosh.notification";
 	public static final String TOKEN = "tigoosh.token";
 
-	private static TiGooshModule instance = null;
+	private static TiGooshModule module = null;
 
 	private KrollFunction successCallback = null;
 	private KrollFunction errorCallback = null;
 	private KrollFunction messageCallback = null;
 
-	public Boolean registered = false;
+	public Boolean remoteNotificationsEnabled = false;
 
 	public TiGooshModule() {
 		super();
-		instance = this;
+		module = this;
 	}
 
-	public static TiGooshModule getInstance() {
-		return instance;
+	public static TiGooshModule getModule() {
+		return module;
 	}
 
 	public void parseBootIntent() {
@@ -75,7 +75,7 @@ public class TiGooshModule extends KrollModule {
 				String notification = intent.getStringExtra(INTENT_EXTRA);
 
 				intent.removeExtra(INTENT_EXTRA);
-				instance.sendMessage(notification, true);
+				sendMessage(notification, true);
 
 			} else {
 				Log.d(LCAT, "No notification in Intent");
@@ -101,7 +101,7 @@ public class TiGooshModule extends KrollModule {
 		return true;
 	}
 
-	private static NotificationManager getNotificationManager() {
+	private NotificationManager getNotificationManager() {
 		return (NotificationManager) TiApplication.getInstance().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
@@ -114,11 +114,16 @@ public class TiGooshModule extends KrollModule {
 	public void registerForPushNotifications(HashMap options) {
 		Activity activity = TiApplication.getAppRootOrCurrentActivity();
 
+		if (false == options.containsKey("callback")) {
+			Log.e(LCAT, "You have to specify a callback attribute when calling registerForPushNotifications");
+			return;
+		}
+
+		messageCallback = (KrollFunction)options.get("callback");
+
 		successCallback = options.containsKey("success") ? (KrollFunction)options.get("success") : null;
 		errorCallback = options.containsKey("error") ? (KrollFunction)options.get("error") : null;
-		messageCallback = options.containsKey("callback") ? (KrollFunction)options.get("callback") : null;
 
-		registered = true;
 		parseBootIntent();
 
 		if (checkPlayServices()) {
@@ -164,7 +169,7 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	@Kroll.getProperty
 	public Boolean isRemoteNotificationsEnabled() {
-		return getDefaultSharedPreferences().contains(TOKEN);
+		return remoteNotificationsEnabled;
 	}
 
 	@Kroll.method
@@ -190,12 +195,15 @@ public class TiGooshModule extends KrollModule {
 	}
 
 	private void saveToken(String token) {
-		getDefaultSharedPreferences().edit().putString(TOKEN, token).apply();
+		SharedPreferences preferences = getDefaultSharedPreferences();
+		preferences.edit().putString(TOKEN, token).apply();
 	}
 
 	// Public
 
 	public void sendSuccess(String token) {
+		remoteNotificationsEnabled = true;
+
 		if (successCallback == null) {
 			Log.e(LCAT, "sendSuccess invoked but no successCallback defined");
 			return;
@@ -205,10 +213,13 @@ public class TiGooshModule extends KrollModule {
 
 		HashMap<String, Object> e = new HashMap<String, Object>();
 		e.put("deviceToken", token);
+
 		successCallback.callAsync(getKrollObject(), e);
 	}
 
 	public void sendError(Exception ex) {
+		remoteNotificationsEnabled = false;
+
 		if (errorCallback == null) {
 			Log.e(LCAT, "sendError invoked but no errorCallback defined");
 			return;
@@ -226,17 +237,11 @@ public class TiGooshModule extends KrollModule {
 			return;
 		}
 
-		try {
+		HashMap<String, Object> e = new HashMap<String, Object>();
+		e.put("data", data); // to parse on reverse on JS side
+		e.put("inBackground", inBackground);
 
-			HashMap<String, Object> e = new HashMap<String, Object>();
-			e.put("data", data); // to parse on reverse on JS side
-			e.put("inBackground", inBackground);
-
-			messageCallback.callAsync(getKrollObject(), e);
-
-		} catch (Exception ex) {
-			Log.e(LCAT, "Error sending gmessage to JS: " + ex.getMessage());
-		}
+		messageCallback.callAsync(getKrollObject(), e);
 	}
 
 }

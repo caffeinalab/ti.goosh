@@ -93,7 +93,7 @@ to activate the notifications for both iOS / Android.
 
 Property | Type | Description
 --- | ---| --- | ----
-remoteNotificationsEnabled | Boolean | Check if the notifications are active.
+remoteNotificationsEnabled | Boolean | Check if the notifications are registered with `registerForPushNotifications`.
 remoteDeviceUUID | String | Get the device token previously obtained.
 
 ## Set the badge
