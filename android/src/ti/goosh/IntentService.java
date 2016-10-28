@@ -78,9 +78,15 @@ public class IntentService extends GcmListenerService {
 	}
 
 	private void parseNotification(Bundle bundle) {
+		TiGooshModule module = TiGooshModule.getModule();
+
 		Context context = getApplicationContext();
 		Boolean appInBackground = !TiApplication.isCurrentActivityInForeground();
 
+		// Flag that determine if the message should be broadcasted to TiGooshModule and call the callback
+		Boolean sendMessage = !appInBackground;
+
+		// Flag to show the system alert
 		Boolean showNotification = true;
 
 		String jsonData = bundle.getString("data");
@@ -94,16 +100,18 @@ public class IntentService extends GcmListenerService {
 		}
 
 		if (data != null && data.has("alert") == true) {
+
 			if (appInBackground) {
 				showNotification = true;
 			} else {
 				if (data.has("force_show_in_foreground")) {
-					JsonPrimitive showInFore = data.getAsJsonPrimitive("force_show_in_foreground");
-					showNotification = ((showInFore.isBoolean() && showInFore.getAsBoolean() == true));
+					JsonPrimitive forceShowInForeground = data.getAsJsonPrimitive("force_show_in_foreground");
+					showNotification = ((forceShowInForeground.isBoolean() && forceShowInForeground.getAsBoolean() == true));
 				} else {
 					showNotification = false;
 				}
 			}
+
 		} else {
 
 			Log.i(LCAT, "Not showing notification cause missing data.alert");
@@ -118,10 +126,14 @@ public class IntentService extends GcmListenerService {
 
 		}
 
+		if (sendMessage) {
+			module.sendMessage(jsonData, appInBackground);
+		}
+
 		if (showNotification) {
 
 			Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
-			notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			notificationIntent.putExtra(TiGooshModule.INTENT_EXTRA, jsonData);
 
 			PendingIntent contentIntent = PendingIntent.getActivity(this, new Random().nextInt(), notificationIntent, PendingIntent.FLAG_ONE_SHOT);
@@ -374,10 +386,6 @@ public class IntentService extends GcmListenerService {
 			// Send
 			NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(tag, id, builder.build());
-		}
-
-		if (!appInBackground && TiGooshModule.getInstance() != null) {
-			TiGooshModule.getInstance().sendMessage(jsonData, appInBackground);
 		}
 	}
 
