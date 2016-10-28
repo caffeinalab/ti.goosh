@@ -203,52 +203,31 @@ Notes:
 * If `alert` is not present, no message is shown in the notification center.
 * The pair (`tag`, `id`) identifies this notification from your app to the system, so that pair should be unique within your app. If you call one of the notify methods with a (tag, id) pair that is currently active and a new set of notification parameters, it will be updated.
 
-## A PHP Example
+## A PHP/Shell Example
 
 ```php
 <?php
 
 define('GOOGLE_KEY', '');
 
-$json = '{
-  "registration_ids": ["DEVICETOKEN1", "DEVICETOKEN2"],
-  "data":{
-    "data": {
-      "alert": "Alert",
-      "title": "Title",
-      "vibrate": true,
-      "sound": "default",
-      "badge": 1,
-      "tag": "APP",
-      "id": 1,
-      "force_show_in_foreground": false,
-      "data": {
-			"foo" : "bar"
-   	},
-      "lights": {
-      	"argb": "#50ff00ff",
-      	"onMs": 50,
-      	"offMs": 50
-      },
-      "ongoing": false,
-      "group": 'groupA',
-      "group_summary": true,
-      "when": 1470058413,
-      "only_alert_once": true
-    }
-  }
-}';
+$json = [
+  "registration_ids" => [
+  "cAU7A9Xo8T8:APA91bF9tkp5XeBmAdQqpemHupAhzXL9RDR727yRl9TEzl3mnQugxhaTi1POYepV74AszvlyN7dxbyJV2VJhW52m0-hWjZIfcIMmy3Zf11y0dHYgBHZ_GeAhhCpviR5CZaMUFcanq7ze"
+  ],
+  "data"    => [
+    "data"  => [
+      "alert"     => "Testing " . time(),
+      "title"     => "The title",
+      "vibrate"   => [100,50,50,50,100],
+      "badge"     => 1,
+      "tag"       => "APP",
+    ]
+  ]
+];
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://android.googleapis.com/gcm/send');
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [ 'Authorization: key=' . GOOGLE_KEY, 'Content-Type: application/json' ]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-echo curl_exec($ch);
-curl_close($ch);
+echo json_encode($json, JSON_PRETTY_PRINT);
+
+echo exec("curl -X POST -H 'Authorization: key=" . GOOGLE_KEY . "' -H 'Content-Type: application/json' --data " . escapeshellarg(json_encode($json)) . ' https://android.googleapis.com/gcm/send');
 ```
 
 ## Handle the notification on the app
