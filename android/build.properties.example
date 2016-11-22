@@ -1,7 +1,7 @@
-titanium.sdk=/Users/flavio.destefano/Library/Application\ Support/Titanium/
+titanium.sdk=/Users/ani.sinanaj/Library/Application\ Support/Titanium/
 titanium.os=osx
-titanium.version=5.2.2.GA
-android.sdk=/opt/android/
+titanium.version=6.0.0.GA
+android.sdk=/Users/ani.sinanaj/Applications/Android/sdk
 
 titanium.platform=${titanium.sdk}/mobilesdk/${titanium.os}/${titanium.version}/android
 android.platform=${android.sdk}/platforms/android-23

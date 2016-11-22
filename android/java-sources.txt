@@ -1,0 +1,6 @@
+"/Users/ani.sinanaj/Mobile/ti.goosh/android/build/generated/java/ti/goosh/TiGooshBootstrap.java"
+"/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/BadgeUtils.java"
+"/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/IntentService.java"
+"/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/PushHandlerActivity.java"
+"/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/RegistrationIntentService.java"
+"/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/TiGooshModule.java"
