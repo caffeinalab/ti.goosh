@@ -19,24 +19,31 @@ public class PushHandlerActivity extends Activity {
 		Log.d(LCAT, "started");
 		super.onCreate(savedInstanceState);
 
+		TiGooshModule module = TiGooshModule.getModule();
 		Context context = getApplicationContext();
 		String notification = getIntent().getStringExtra(TiGooshModule.INTENT_EXTRA);
-		TiGooshModule instance = TiGooshModule.getInstance();
 
 		Intent launcherIntent;
 
-		if (instance == null) {
+		if (TiApplication.getAppRootOrCurrentActivity() == null) {
 			launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
 			launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		} else {
 			launcherIntent = TiApplication.getAppRootOrCurrentActivity().getIntent();
-			instance.sendMessage(notification, true);
+			if (module != null) {
+				TiGooshModule.getModule().sendMessage(notification, true);
+			}
 		}
 
 		launcherIntent.putExtra(TiGooshModule.INTENT_EXTRA, notification);
 		startActivity(launcherIntent);
 
 		finish();
+	}
+
+	@Override protected void onResume() {
+		Log.d(LCAT, "resumed");
+		super.onResume();
 	}
 	
 }
