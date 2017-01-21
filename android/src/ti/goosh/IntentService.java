@@ -119,7 +119,7 @@ public class IntentService extends GcmListenerService {
 
 			// Parse additional silent features
 
-			if (data.has("badge")) {
+			if (data != null && data.has("badge")) {
 				int badge = data.getAsJsonPrimitive("badge").getAsInt();
 				BadgeUtils.setBadge(context, badge);
 			}
