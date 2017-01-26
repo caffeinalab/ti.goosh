@@ -55,8 +55,6 @@ public class TiGooshModule extends KrollModule {
 	private KrollFunction errorCallback = null;
 	private KrollFunction messageCallback = null;
 
-	public Boolean remoteNotificationsEnabled = false;
-
 	public TiGooshModule() {
 		super();
 		module = this;
@@ -169,7 +167,7 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	@Kroll.getProperty
 	public Boolean isRemoteNotificationsEnabled() {
-		return remoteNotificationsEnabled;
+		return (getRemoteDeviceUUID() != null);
 	}
 
 	@Kroll.method
@@ -202,8 +200,6 @@ public class TiGooshModule extends KrollModule {
 	// Public
 
 	public void sendSuccess(String token) {
-		remoteNotificationsEnabled = true;
-
 		if (successCallback == null) {
 			Log.e(LCAT, "sendSuccess invoked but no successCallback defined");
 			return;
@@ -218,8 +214,6 @@ public class TiGooshModule extends KrollModule {
 	}
 
 	public void sendError(Exception ex) {
-		remoteNotificationsEnabled = false;
-
 		if (errorCallback == null) {
 			Log.e(LCAT, "sendError invoked but no errorCallback defined");
 			return;
