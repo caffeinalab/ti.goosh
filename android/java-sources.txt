@@ -1,3 +1,4 @@
+"/Users/flavio.destefano/Repos/ti.goosh/android/build/generated/java/ti/goosh/TiGooshBootstrap.java"
 "/Users/flavio.destefano/Repos/ti.goosh/android/src/ti/goosh/BadgeUtils.java"
 "/Users/flavio.destefano/Repos/ti.goosh/android/src/ti/goosh/IntentService.java"
 "/Users/flavio.destefano/Repos/ti.goosh/android/src/ti/goosh/PushHandlerActivity.java"

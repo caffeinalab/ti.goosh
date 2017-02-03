@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-function sendGCM($message, $id) {
+function sendGCM($id) {
 
 
     $url = 'https://fcm.googleapis.com/fcm/send';
@@ -38,4 +38,4 @@ function sendGCM($message, $id) {
     curl_close ( $ch );
 }
 
-sendGCM("Test", "DEVICE TOKEN");
+sendGCM("DEVICE TOKEN");
