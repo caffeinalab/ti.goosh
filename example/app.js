@@ -4,6 +4,7 @@ TiGoosh.registerForPushNotifications({
     // The callback to invoke when a notification arrives.
     callback: function(e) {
         var data = JSON.parse(e.data || '');
+	alert(data.alert);
     },
 
     // The callback invoked when you have the device token.
