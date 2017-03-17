@@ -68,11 +68,9 @@ public class TiGooshModule extends KrollModule {
 		try {
 			Intent intent = TiApplication.getAppRootOrCurrentActivity().getIntent();
 
-			if (intent.hasExtra(INTENT_EXTRA)) {
+			String notification = intent.getExtras().getString("data");
 
-				String notification = intent.getStringExtra(INTENT_EXTRA);
-
-				intent.removeExtra(INTENT_EXTRA);
+			if (!notification.isEmpty()) {
 				sendMessage(notification, true);
 
 			} else {
