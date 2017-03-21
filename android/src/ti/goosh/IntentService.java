@@ -90,38 +90,42 @@ public class IntentService extends GcmListenerService {
 		Boolean showNotification = appInBackground;
 
 		// the title and alert
-		String title = bundle.getString("title", "");
-		String alert = bundle.getString("data",
-			TiApplication.getInstance().getAppInfo().getName());
+		String title = bundle.getString("title", bundle.getString("message", ""));
+		String alert = bundle.getString("data", "");
 
 		// get the `data` or fallback for `custom` (OneSignal)
 		String jsonData = bundle.getString("data", bundle.getString("custom"));
-		JsonObject data = null; // empty json
+		JsonObject data = null;
 
-		try {
-			data = (JsonObject) new Gson().fromJson(jsonData, JsonObject.class);
-		} catch (Exception ex) {
-			Log.e(LCAT, "Error parsing data JSON: " + ex.getMessage());
-			data = (JsonObject) new Gson().fromJson("", JsonObject.class);
+		if (jsonData != null) {
+			try {
+				data = (JsonObject) new Gson().fromJson(jsonData, JsonObject.class);
+			} catch (Exception ex) {
+				Log.e(LCAT, "Error parsing data JSON: " + ex.getMessage());
+			}
 		}
 
 		// OneSignal does not send as `alert`, but `a` instead.
-		if (data.has("alert") == false && data.has("a") == true) {
+		if (data != null && data.has("alert") == false && data.has("a") == true) {
 			data = data.getAsJsonObject("a");
 		}
 
 		// overwrite the alert
-		if (data.has("title")) {
+		if (data != null && data.has("title")) {
 			title = data.getAsJsonPrimitive("title").getAsString();
 		}
 
 		// overwrite the alert
-		if (data.has("alert")) {
+		if (data != null && data.has("alert")) {
 			alert = data.getAsJsonPrimitive("alert").getAsString();
 		}
 
+		if (alert.isEmpty()) {
+			alert = TiApplication.getInstance().getAppInfo().getName();
+		}
+
 		if (!appInBackground) {
-			if (data.has("force_show_in_foreground")) {
+			if (data != null && data.has("force_show_in_foreground")) {
 				JsonPrimitive forceShowInForeground = data.getAsJsonPrimitive("force_show_in_foreground");
 				showNotification = ((forceShowInForeground.isBoolean() && forceShowInForeground.getAsBoolean() == true));
 			} else {
@@ -129,7 +133,7 @@ public class IntentService extends GcmListenerService {
 			}
 		}
 
-		if (data.has("badge") == true) {
+		if (data != null && data.has("badge") == true) {
 			int badge = data.getAsJsonPrimitive("badge").getAsInt();
 			BadgeUtils.setBadge(context, badge);
 		}
@@ -163,7 +167,7 @@ public class IntentService extends GcmListenerService {
 			builder.setTicker(alert);
 
 			// BigText
-			if (data.has("big_text")) {
+			if (data != null && data.has("big_text")) {
 				NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
 				bigTextStyle.bigText(data.getAsJsonPrimitive("big_text").getAsString());
 
@@ -185,7 +189,7 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Large icon
-			if (data.has("icon")) {
+			if (data != null && data.has("icon")) {
 				try {
 					Bitmap icon = this.getBitmapFromURL( data.getAsJsonPrimitive("icon").getAsString() );
 					builder.setLargeIcon(icon);
@@ -195,7 +199,7 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Color
-			if (data.has("color")) {
+			if (data != null && data.has("color")) {
 				try {
 					int color = Color.parseColor( data.getAsJsonPrimitive("color").getAsString() );
 					builder.setColor( color );
@@ -205,14 +209,14 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Badge
-			if (data.has("badge")) {
+			if (data != null && data.has("badge")) {
 				int badge = data.getAsJsonPrimitive("badge").getAsInt();
 				BadgeUtils.setBadge(context, badge);
 				builder.setNumber(badge);
 			}
 
 			// Sound
-			if (data.has("sound")) {
+			if (data != null && data.has("sound")) {
 				JsonPrimitive sound = data.getAsJsonPrimitive("sound");
 				if ( ("default".equals(sound.getAsString())) || (sound.isBoolean() && sound.getAsBoolean() == true) ) {
 					builder_defaults |= Notification.DEFAULT_SOUND;
@@ -223,7 +227,7 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Vibration
-			if (data.has("vibrate")) {
+			if (data != null && data.has("vibrate")) {
 				try {
 					JsonElement vibrateJson = data.get("vibrate");
 
@@ -254,7 +258,7 @@ public class IntentService extends GcmListenerService {
 
 
 			// Lights
-			if (data.has("lights")) {
+			if (data != null && data.has("lights")) {
 				try {
 					JsonElement lightsJson = data.get("lights");
 
@@ -277,7 +281,7 @@ public class IntentService extends GcmListenerService {
 
 
 			// Ongoing
-			if (data.has("ongoing")) {
+			if (data != null && data.has("ongoing")) {
 				try {
 					JsonElement ongoingJson = data.get("ongoing");
 
@@ -294,7 +298,7 @@ public class IntentService extends GcmListenerService {
 			}
 
 			// Group
-			if (data.has("group")) {
+			if (data != null && data.has("group")) {
 				try {
 					JsonElement groupJson = data.get("group");
 
@@ -311,7 +315,7 @@ public class IntentService extends GcmListenerService {
 
 
 			// GroupSummary
-			if (data.has("group_summary")) {
+			if (data != null && data.has("group_summary")) {
 				try {
 					JsonElement groupsumJson = data.get("group_summary");
 
@@ -328,7 +332,7 @@ public class IntentService extends GcmListenerService {
 
 
 			// When
-			if (data.has("when")) {
+			if (data != null && data.has("when")) {
 				try {
 					JsonElement whenJson = data.get("when");
 
@@ -345,7 +349,7 @@ public class IntentService extends GcmListenerService {
 
 
 			// Only alert once
-			if (data.has("only_alert_once")) {
+			if (data != null && data.has("only_alert_once")) {
 				try {
 					JsonElement oaoJson = data.get("only_alert_once");
 
@@ -366,13 +370,13 @@ public class IntentService extends GcmListenerService {
 
 			// Tag
 			String tag = null;
-			if (data.has("tag")) {
+			if (data != null && data.has("tag")) {
 				tag = data.getAsJsonPrimitive("tag").getAsString();
 			}
 
 			// Nid
 			int id = 0;
-			if (data.has("id")) {
+			if (data != null && data.has("id")) {
 				// ensure that the id sent from the server is negative to prevent
 				// collision with the atomic integer
 				id = -1 * Math.abs(data.getAsJsonPrimitive("id").getAsInt());
