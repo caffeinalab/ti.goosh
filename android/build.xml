@@ -26,18 +26,18 @@
 
 	<!-- HACK: prevents the "duplicate entry: assets/README" -->
 	<!-- Copy assets subdirectories -->
-	<!-- <mkdir dir="${basedir}/assets"/>
+	<mkdir dir="${basedir}/assets"/>
 	<copy todir="${basedir}/assets">
 		<fileset dir="${basedir}/../assets"/>
-	</copy> -->
+	</copy>
 
 	<!-- Copy license -->
 	<copy todir="${basedir}" file="${basedir}/../LICENSE"/>
-
 	<target name="cleancopy" description="Delete old copies">
+
 		<delete dir="${basedir}/documentation"/>
 		<delete dir="${basedir}/example"/>
-		<!-- <delete dir="${basedir}/assets"/> -->
+		<delete dir="${basedir}/assets"/>
 		<delete file="${basedir}/LICENSE"/>
 	</target>
 
