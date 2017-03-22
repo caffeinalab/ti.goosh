@@ -2,57 +2,40 @@
 <ti:module xmlns:ti="http://ti.appcelerator.org" xmlns:android="http://schemas.android.com/apk/res/android">
 	<android xmlns:android="http://schemas.android.com/apk/res/android">
 		<manifest package="ti.goosh" android:versionCode="1" android:versionName="1.0" android:installLocation="internalOnly">
-
-			<!-- Permission to set badge -->
-			<uses-permission android:name="com.sonyericsson.home.permission.BROADCAST_BADGE" />
-
-
-			<!-- [START gcm_permission] -->
-			<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-			<uses-permission android:name="android.permission.WAKE_LOCK" />
-			<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-			<uses-permission android:name="android.permission.VIBRATE"/>
-			<uses-permission android:name="android.permission.INTERNET"/>
-			<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-			<uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-			<!-- [END gcm_permission] -->
-
 			<application>
 
 				<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-
-				<!-- [START gcm_receiver] -->
-				<receiver
-					android:name="com.google.android.gms.gcm.GcmReceiver"
-					android:exported="true"
-					android:permission="com.google.android.c2dm.permission.SEND" >
-					<intent-filter>
-						<action android:name="com.google.android.c2dm.intent.RECEIVE" />
-						<category android:name="${tiapp.properties['id']}" />
-					</intent-filter>
-				</receiver>
-				<!-- [END gcm_receiver] -->
-
+				<meta-data
+				    android:name="com.google.firebase.messaging.default_notification_color"
+				    android:resource="@color/colorAccent" />
+				
 				<!-- [START gcm_listener] -->
 				<service
-					android:name="ti.goosh.IntentService"
-					android:exported="false" >
+					android:name="ti.goosh.FcmMessagingService">
 					<intent-filter>
-						<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+						<action android:name="com.google.firebase.MESSAGING_EVENT" />
 					</intent-filter>
 				</service>
 				<!-- [END gcm_listener] -->
 
 				<service
-					android:name="ti.goosh.RegistrationIntentService"
-					android:exported="false">
+				    android:name="ti.goosh.FcmListenerService">
+				    <intent-filter>
+				        <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+				    </intent-filter>
 				</service>
+
+				<service android:name="ti.goosh.FcmJobService"
+		                 android:exported="false">
+		            <intent-filter>
+		                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+		            </intent-filter>
+		        </service>
 	
-				<activity
+				<!-- <activity
 					android:name="ti.goosh.PushHandlerActivity"
 					android:exported="true">
-				</activity>
+				</activity> -->
 
 			</application>
 

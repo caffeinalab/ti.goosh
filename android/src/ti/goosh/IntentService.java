@@ -36,22 +36,29 @@ import com.google.gson.JsonPrimitive;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.util.TiRHelper;
 
-import com.google.android.gms.gcm.GcmListenerService;
-
-public class IntentService extends GcmListenerService {
+public class IntentService extends FirebaseMessagingService {
 
 	private static final String LCAT = "ti.goosh.IntentService";
 	private static final AtomicInteger atomic = new AtomicInteger(0);
 
 	@Override
-	public void onMessageReceived(String from, Bundle bundle) {
-		Log.d(LCAT, "Push notification received from: " + from);
-		for (String key : bundle.keySet()) {
+	public void onMessageReceived(RemoteMessage message) {
+		Log.d(LCAT, "Push notification received from: " + message.getFrom());
+		Map data = message.getData();
+		/*for (String key : bundle.keySet()) {
 			Object value = bundle.get(key);
 			Log.d(LCAT, String.format("Notification key : %s => %s (%s)", key, value.toString(), value.getClass().getName()));
-		}
+		}*/
 
-		parseNotification(bundle);
+		//parseNotification(bundle);
+	}
+
+	public void subscribeToTopic(String topic) {
+		FirebaseMessaging.getInstance().subscribeToTopic(topic);
+	}
+
+	public void unsubscribeToTopic(String topic) {
+		FirebaseMessaging.getInstance().unsubscribeToTopic(topic);
 	}
 
 	private int getResource(String type, String name) {
