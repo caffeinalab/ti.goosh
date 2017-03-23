@@ -84,18 +84,6 @@ public class TiGooshModule extends KrollModule {
 	}
 
 	private boolean checkPlayServices() {
-		/*Activity activity = TiApplication.getAppRootOrCurrentActivity();
-
-		GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-		int resultCode = apiAvailability.isGooglePlayServicesAvailable(activity);
-		if (resultCode != ConnectionResult.SUCCESS) {
-			if (apiAvailability.isUserResolvableError(resultCode)) {
-				apiAvailability.getErrorDialog(activity, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-			} else {
-				Log.e(LCAT, "This device is not supported.");
-			}
-			return false;
-		}*/
 		return true;
 	}
 
@@ -127,21 +115,7 @@ public class TiGooshModule extends KrollModule {
 
 	@Kroll.method
 	public void unregisterForPushNotifications() {
-		/*final String senderId = getSenderId();
-		final Context context = TiApplication.getInstance().getApplicationContext();
-
-		new AsyncTask<Void, Void, Void>() {
-			@Override
-			protected Void doInBackground(Void... params) {
-				try {
-					InstanceID.getInstance(context).deleteToken(senderId, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
-					Log.d(LCAT, "delete instanceid succeeded");
-				} catch (final IOException e) {
-					Log.e(LCAT, "remove token failed - error: " + e.getMessage());
-				}
-				return null;
-			}
-		}.execute();*/
+		
 	}
 
 
@@ -188,12 +162,12 @@ public class TiGooshModule extends KrollModule {
 		return PreferenceManager.getDefaultSharedPreferences(TiApplication.getInstance().getApplicationContext());
 	}
 
-	private void saveToken(String token) {
+	// Public
+
+	public void saveToken(String token) {
 		SharedPreferences preferences = getDefaultSharedPreferences();
 		preferences.edit().putString(TOKEN, token).apply();
 	}
-
-	// Public
 
 	public void sendSuccess(String token) {
 		if (successCallback == null) {
