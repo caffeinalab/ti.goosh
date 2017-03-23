@@ -2,6 +2,7 @@ package ti.goosh;
 
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.util.TiRHelper;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.util.Log;
 
@@ -25,16 +26,13 @@ public class FcmListenerService extends FirebaseInstanceIdService {
 		TiGooshModule module = TiGooshModule.getModule();
 		// Get updated InstanceID token.
 		String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-		Log.d(TAG, "Refreshed token: " + refreshedToken);
-		// TODO: Implement this method to send any registration to your app's servers.
-		//sendRegistrationToServer(refreshedToken);
-		//Launch event to app
+		Log.d(LCAT, "Refreshed token: " + refreshedToken);
 
 		if (module == null) {
 			Log.e(LCAT, "Intent handled but no TiGoosh instance module found");
 			return;
 		} else {
-			module.sendSuccess(token);
+			module.saveToken(refreshedToken);
 		}
 	}
 }

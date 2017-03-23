@@ -31,12 +31,12 @@ import org.appcelerator.titanium.TiApplication;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+//import com.google.android.gms.common.ConnectionResult;
+//import com.google.android.gms.common.GoogleApiAvailability;
 
-import com.google.android.gms.gcm.GcmPubSub;
+/*import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
+import com.google.android.gms.iid.InstanceID;*/
 
 import android.app.NotificationManager;
 
@@ -84,7 +84,7 @@ public class TiGooshModule extends KrollModule {
 	}
 
 	private boolean checkPlayServices() {
-		Activity activity = TiApplication.getAppRootOrCurrentActivity();
+		/*Activity activity = TiApplication.getAppRootOrCurrentActivity();
 
 		GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
 		int resultCode = apiAvailability.isGooglePlayServicesAvailable(activity);
@@ -95,7 +95,7 @@ public class TiGooshModule extends KrollModule {
 				Log.e(LCAT, "This device is not supported.");
 			}
 			return false;
-		}
+		}*/
 		return true;
 	}
 
@@ -123,15 +123,11 @@ public class TiGooshModule extends KrollModule {
 		errorCallback = options.containsKey("error") ? (KrollFunction)options.get("error") : null;
 
 		parseBootIntent();
-
-		if (checkPlayServices()) {
-			activity.startService( new Intent(activity, RegistrationIntentService.class) );
-		}
 	}
 
 	@Kroll.method
 	public void unregisterForPushNotifications() {
-		final String senderId = getSenderId();
+		/*final String senderId = getSenderId();
 		final Context context = TiApplication.getInstance().getApplicationContext();
 
 		new AsyncTask<Void, Void, Void>() {
@@ -145,7 +141,7 @@ public class TiGooshModule extends KrollModule {
 				}
 				return null;
 			}
-		}.execute();
+		}.execute();*/
 	}
 
 

@@ -18,33 +18,14 @@ public class FcmIntent extends Activity {
 		try {
 			Log.d(LCAT, "started");
 			super.onCreate(savedInstanceState);
-			finish();
 
 			if (getIntent().getExtras() != null) {
 	            for (String key : getIntent().getExtras().keySet()) {
 	                Object value = getIntent().getExtras().get(key);
-	                Log.d(TAG, "Key: " + key + " Value: " + value);
+	                Log.d(LCAT, "Key: " + key + " Value: " + value);
 	            }
 	        }
-			
-			/*TiGooshModule module = TiGooshModule.getModule();
-			Context context = getApplicationContext();
-			String notification = getIntent().getStringExtra(TiGooshModule.INTENT_EXTRA);
-
-			Intent launcherIntent;
-
-			if (TiApplication.getAppRootOrCurrentActivity() == null) {
-				launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-				launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-			} else {
-				launcherIntent = TiApplication.getAppRootOrCurrentActivity().getIntent();
-				if (module != null) {
-					TiGooshModule.getModule().sendMessage(notification, true);
-				}
-			}
-
-			launcherIntent.putExtra(TiGooshModule.INTENT_EXTRA, notification);
-			startActivity(launcherIntent);*/
+			finish();	        
 		} catch (Exception e) {
 			// noop
 			finish();

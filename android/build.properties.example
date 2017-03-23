@@ -4,5 +4,5 @@ titanium.version=6.0.0.GA
 android.sdk=/Users/ani.sinanaj/Applications/Android/sdk
 
 titanium.platform=${titanium.sdk}/mobilesdk/${titanium.os}/${titanium.version}/android
-android.platform=${android.sdk}/platforms/android-23
-google.apis=${android.sdk}/add-ons/addon_google_apis_google_23
+android.platform=${android.sdk}/platforms/android-25
+google.apis=${android.sdk}/add-ons/addon_google_apis_google_25
