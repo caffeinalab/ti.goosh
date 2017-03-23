@@ -61,7 +61,8 @@ public class TiGooshModule extends KrollModule {
 	}
 
 	public static TiGooshModule getModule() {
-		return module;
+		if (module != null) return module;
+		else return new TiGooshModule();
 	}
 
 	public void parseBootIntent() {
