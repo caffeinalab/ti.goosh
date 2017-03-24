@@ -23,6 +23,7 @@ public class FcmListenerService extends FirebaseInstanceIdService {
 	// [START refresh_token]
 	@Override
 	public void onTokenRefresh() {
+		Log.e(LCAT, "Is this function being called or not?");
 		TiGooshModule module = TiGooshModule.getModule();
 		// Get updated InstanceID token.
 		String refreshedToken = FirebaseInstanceId.getInstance().getToken();

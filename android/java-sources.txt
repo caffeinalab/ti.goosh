@@ -1,7 +1,6 @@
 "/Users/ani.sinanaj/Mobile/ti.goosh/android/build/generated/java/ti/goosh/TiGooshBootstrap.java"
 "/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/BadgeUtils.java"
 "/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/FcmIntent.java"
-"/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/FcmJobService.java"
 "/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/FcmListenerService.java"
 "/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/FcmMessagingService.java"
 "/Users/ani.sinanaj/Mobile/ti.goosh/android/src/ti/goosh/IntentService.java"

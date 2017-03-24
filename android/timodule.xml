@@ -11,7 +11,7 @@
 				
 				<!-- [START gcm_listener] -->
 				<service
-					android:name="ti.goosh.FcmMessagingService">
+					android:name="ti.goosh.FcmMessagingService" android:exported="true">
 					<intent-filter>
 						<action android:name="com.google.firebase.MESSAGING_EVENT" />
 					</intent-filter>
@@ -19,18 +19,15 @@
 				<!-- [END gcm_listener] -->
 
 				<service
-				    android:name="ti.goosh.FcmListenerService">
+				    android:name="ti.goosh.FcmListenerService" android:exported="true">
 				    <intent-filter>
 				        <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
 				    </intent-filter>
 				</service>
 
-				<service android:name="ti.goosh.FcmJobService"
-		                 android:exported="false">
-		            <intent-filter>
-		                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-		            </intent-filter>
-		        </service>
+				<activity android:name="ti.goosh.FcmIntent"
+		                 android:exported="true">
+		        </activity>
 	
 				<!-- <activity
 					android:name="ti.goosh.PushHandlerActivity"
