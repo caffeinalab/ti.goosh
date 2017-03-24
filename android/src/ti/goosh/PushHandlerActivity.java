@@ -16,29 +16,34 @@ public class PushHandlerActivity extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.d(LCAT, "started");
-		super.onCreate(savedInstanceState);
+		try {
+			Log.d(LCAT, "started");
+			super.onCreate(savedInstanceState);
+			finish();
 
-		TiGooshModule module = TiGooshModule.getModule();
-		Context context = getApplicationContext();
-		String notification = getIntent().getStringExtra(TiGooshModule.INTENT_EXTRA);
+			TiGooshModule module = TiGooshModule.getModule();
+			Context context = getApplicationContext();
+			String notification = getIntent().getStringExtra(TiGooshModule.INTENT_EXTRA);
 
-		Intent launcherIntent;
+			Intent launcherIntent;
 
-		if (TiApplication.getAppRootOrCurrentActivity() == null) {
-			launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-			launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		} else {
-			launcherIntent = TiApplication.getAppRootOrCurrentActivity().getIntent();
-			if (module != null) {
-				TiGooshModule.getModule().sendMessage(notification, true);
+			if (TiApplication.getAppRootOrCurrentActivity() == null) {
+				launcherIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+				launcherIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+			} else {
+				launcherIntent = TiApplication.getAppRootOrCurrentActivity().getIntent();
+				if (module != null) {
+					TiGooshModule.getModule().sendMessage(notification, true);
+				}
 			}
+
+			launcherIntent.putExtra(TiGooshModule.INTENT_EXTRA, notification);
+			startActivity(launcherIntent);
+		} catch (Exception e) {
+			// noop
+		} finally {
+			finish();
 		}
-
-		launcherIntent.putExtra(TiGooshModule.INTENT_EXTRA, notification);
-		startActivity(launcherIntent);
-
-		finish();
 	}
 
 	@Override protected void onResume() {
