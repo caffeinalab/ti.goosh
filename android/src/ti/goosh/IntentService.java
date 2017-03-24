@@ -138,7 +138,7 @@ public class IntentService extends GcmListenerService {
 			BadgeUtils.setBadge(context, badge);
 		}
 
-		if (sendMessage) {
+		if (sendMessage && module != null) {
 			module.sendMessage(jsonData, appInBackground);
 		}
 
