@@ -61,20 +61,27 @@ public class TiGooshModule extends KrollModule {
 	}
 
 	public static TiGooshModule getModule() {
-		return module;
+		if (module != null) return module;
+		else return new TiGooshModule();
 	}
 
 	public void parseBootIntent() {
 		try {
 			Intent intent = TiApplication.getAppRootOrCurrentActivity().getIntent();
+			String notification = "";
 
-			if (intent.hasExtra(INTENT_EXTRA)) {
+			if (intent.getExtras() != null) {
+				for (String key : intent.getExtras().keySet()) {
+					if (key == "data") {
+						notification = intent.getExtras().getString("data");
+					}
+	                Object value = intent.getExtras().get(key);
+	                Log.d(LCAT, "Key: " + key + " Value: " + value);
+	            }
+			}
 
-				String notification = intent.getStringExtra(INTENT_EXTRA);
-
-				intent.removeExtra(INTENT_EXTRA);
+			if (!notification.isEmpty()) {
 				sendMessage(notification, true);
-
 			} else {
 				Log.d(LCAT, "No notification in Intent");
 			}

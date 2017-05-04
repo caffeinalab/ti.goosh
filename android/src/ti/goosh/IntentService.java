@@ -126,7 +126,7 @@ public class IntentService extends GcmListenerService {
 
 		}
 
-		if (sendMessage) {
+		if (sendMessage && module != null) {
 			module.sendMessage(jsonData, appInBackground);
 		}
 
