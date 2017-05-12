@@ -2,6 +2,7 @@ package ti.goosh;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.io.IOException;
 import java.net.URL;
 import java.net.HttpURLConnection;
@@ -94,7 +95,8 @@ public class IntentService extends GcmListenerService {
 		String alert = bundle.getString("data", "");
 
 		// get the `data` or fallback for `custom` (OneSignal)
-		String jsonData = bundle.getString("data", bundle.getString("custom"));
+
+		String jsonData = bundle.getString("data", bundle.getString("custom", getCountlyId(bundle)));
 		JsonObject data = null;
 
 		if (jsonData != null) {
@@ -392,4 +394,8 @@ public class IntentService extends GcmListenerService {
 		}
 	}
 
+	private String getCountlyId(Bundle bundle) {
+		String id = bundle.getString("c.i");
+		return "{\"c.i\": \"" + id + "\"}";
+	}
 }
