@@ -170,6 +170,7 @@ Property | Type | Default | Description
 --- | --- | --- | ----
 alert | String | `null` | The message to show in the notification center and in the status bar. 
 title | String | App Title | The title to show in the notification center.
+sound | String | `false` | The sound of the notification. If `true` or `default` the default sound is used, otherwise you can specificy an audio file path located in the app bundle (`/assets/`)
 vibrate | Boolean | `false` | Control the vibration of the phone.
 vibrate | Array | `null` | This property can also be an array with a pattern. When the notification is received the device will vibrate following that pattern
 lights | Object | `null` | This optional property sets the LED light color and frequency. Check out the property description below on how to send it
