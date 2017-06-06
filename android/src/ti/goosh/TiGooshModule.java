@@ -67,17 +67,15 @@ public class TiGooshModule extends KrollModule {
 
 	public void parseBootIntent() {
 		try {
-			Intent intent = TiApplication.getAppRootOrCurrentActivity().getIntent();
+			Bundle extras = TiApplication.getAppRootOrCurrentActivity().getIntent().getExtras();
 			String notification = "";
 
-			if (intent.getExtras() != null) {
-				for (String key : intent.getExtras().keySet()) {
-					if (key == "data") {
-						notification = intent.getExtras().getString("data");
-					}
-	                Object value = intent.getExtras().get(key);
-	                Log.d(LCAT, "Key: " + key + " Value: " + value);
-	            }
+			if (extras != null) {
+				notification = extras.getString("data");
+				for (String key : extras.keySet()) {
+	                		Object value = extras.get(key);
+	                		Log.d(LCAT, "Key: " + key + " Value: " + value);
+	            		}
 			}
 
 			if (!notification.isEmpty()) {
