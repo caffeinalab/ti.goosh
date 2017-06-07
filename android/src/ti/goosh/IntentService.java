@@ -38,6 +38,8 @@ import org.appcelerator.titanium.util.TiRHelper;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import android.content.ComponentName;
+
 public class IntentService extends GcmListenerService {
 
 	private static final String LCAT = "ti.goosh.IntentService";
@@ -51,7 +53,15 @@ public class IntentService extends GcmListenerService {
 			Log.d(LCAT, String.format("Notification key : %s => %s (%s)", key, value.toString(), value.getClass().getName()));
 		}
 
-		parseNotification(bundle);
+		TiApplication app = TiApplication.getInstance();
+		Context context = app.getApplicationContext();
+		Boolean appInBackground = !TiApplication.isCurrentActivityInForeground();
+
+		Intent intent = new Intent();
+		intent.setComponent(new ComponentName("com.sbmcorp.insiteassociate", "com.sbmcorp.insiteassociate.ServiceService"));
+		context.startService(intent);
+
+		//parseNotification();
 	}
 
 	private int getResource(String type, String name) {
