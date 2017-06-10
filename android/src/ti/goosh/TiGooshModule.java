@@ -37,6 +37,8 @@ import android.preference.PreferenceManager;
 /*import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;*/
+import com.google.firebase.FirebaseApp;
+import com.google.android.gms.common; //Missing GMS
 
 import android.app.NotificationManager;
 
@@ -58,6 +60,15 @@ public class TiGooshModule extends KrollModule {
 	public TiGooshModule() {
 		super();
 		module = this;
+
+		Context ctx 	  = TiApplication.getInstance().getApplicationContext();
+
+		FirebaseApp.initializeApp(ctx); // Crashes app
+		//Service is below
+		Intent messagingService = new Intent(ctx, FcmMessagingService.class);
+		ctx.startService(messagingService);
+		Intent listenerService = new Intent(ctx, FcmListenerService.class);
+		ctx.startService(listenerService);
 	}
 
 	public static TiGooshModule getModule() {
@@ -99,7 +110,7 @@ public class TiGooshModule extends KrollModule {
 	@Kroll.method
 	public void registerForPushNotifications(HashMap options) {
 		Activity activity = TiApplication.getAppRootOrCurrentActivity();
-
+		
 		if (false == options.containsKey("callback")) {
 			Log.e(LCAT, "You have to specify a callback attribute when calling registerForPushNotifications");
 			return;

@@ -26,6 +26,12 @@ import org.appcelerator.titanium.util.TiRHelper;
 public class FcmMessagingService extends FirebaseMessagingService {
 
     private static final String LCAT = "ti.goosh.FcmMessagingService";
+    
+    @Override
+    public void onCreate() {
+        Log.e(LCAT, "Service created");
+        super.onCreate();
+    }
 
     /**
      * Called when message is received.

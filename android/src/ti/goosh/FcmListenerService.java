@@ -14,6 +14,12 @@ public class FcmListenerService extends FirebaseInstanceIdService {
 	private static final String LCAT = "ti.goosh.FcmListenerService";
 	private static final AtomicInteger atomic = new AtomicInteger(0);
 
+    @Override
+    public void onCreate() {
+        Log.e(LCAT, "Service created");
+        super.onCreate();
+    }
+
 	/**
 	* Called if InstanceID token is updated. This may occur if the security of
 	* the previous token had been compromised. Note that this is also called
