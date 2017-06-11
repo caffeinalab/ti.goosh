@@ -38,7 +38,7 @@ import android.preference.PreferenceManager;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;*/
 import com.google.firebase.FirebaseApp;
-import com.google.android.gms.common; //Missing GMS
+import com.google.firebase.FirebaseOptions;
 
 import android.app.NotificationManager;
 
@@ -61,18 +61,32 @@ public class TiGooshModule extends KrollModule {
 		super();
 		module = this;
 
-		Context ctx 	  = TiApplication.getInstance().getApplicationContext();
+		initFirebase();
+	}
 
-		FirebaseApp.initializeApp(ctx); // Crashes app
+	public static TiGooshModule getModule() {
+		return module;
+	}
+
+	private void initFirebase() {
+		
+
+        Context ctx 	  = TiApplication.getInstance().getApplicationContext();
+
+		if (!FirebaseApp.getApps(ctx).isEmpty()) {
+			FirebaseOptions options = new FirebaseOptions.Builder()
+			// 	.setApplicationId("com.progress44.test")
+			// 	.setServiceAccount(new FileInputStream("path/to/serviceAccountKey.json"))
+				.build();
+		
+			FirebaseApp.initializeApp(ctx, options); // Crashes app
+		}
+		
 		//Service is below
 		Intent messagingService = new Intent(ctx, FcmMessagingService.class);
 		ctx.startService(messagingService);
 		Intent listenerService = new Intent(ctx, FcmListenerService.class);
 		ctx.startService(listenerService);
-	}
-
-	public static TiGooshModule getModule() {
-		return module;
 	}
 
 	public void parseBootIntent() {
