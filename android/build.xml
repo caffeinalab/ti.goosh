@@ -24,6 +24,7 @@
 		</condition>
 	</fail>
 
+	<!-- HACK: prevents the "duplicate entry: assets/README" -->
 	<!-- Copy assets subdirectories -->
 	<mkdir dir="${basedir}/assets"/>
 	<copy todir="${basedir}/assets">
@@ -32,8 +33,8 @@
 
 	<!-- Copy license -->
 	<copy todir="${basedir}" file="${basedir}/../LICENSE"/>
-
 	<target name="cleancopy" description="Delete old copies">
+
 		<delete dir="${basedir}/documentation"/>
 		<delete dir="${basedir}/example"/>
 		<delete dir="${basedir}/assets"/>
