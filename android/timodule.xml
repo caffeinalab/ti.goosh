@@ -13,17 +13,21 @@
 			<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 			<uses-permission android:name="android.permission.VIBRATE"/>
 			<uses-permission android:name="android.permission.INTERNET"/>
-			<uses-permission android:name="android.permission.USE_CREDENTIALS"/>
 			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 			<!-- [END gcm_permission] -->
+
+
+			<permission android:name="${tiapp.properties['id']}.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+			<uses-permission android:name="${tiapp.properties['id']}.permission.C2D_MESSAGE" />
 
 			<application>
 
 				<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
 				<!-- [START gcm_receiver] -->
+				<!-- android:name="com.google.android.gms.gcm.GcmReceiver" -->
 				<receiver
-					android:name="com.google.android.gms.gcm.GcmReceiver"
+					android:name="ti.goosh.BroadcastReceiver"
 					android:exported="true"
 					android:permission="com.google.android.c2dm.permission.SEND" >
 					<intent-filter>
@@ -42,6 +46,16 @@
 					</intent-filter>
 				</service>
 				<!-- [END gcm_listener] -->
+
+				<!-- [START instanceId_listener] -->
+		        <service
+		            android:name="ti.goosh.InstanceIDListener"
+		            android:exported="false">
+		            <intent-filter>
+		                <action android:name="com.google.android.gms.iid.InstanceID"/>
+		            </intent-filter>
+		        </service>
+		        <!-- [END instanceId_listener] -->
 
 				<service
 					android:name="ti.goosh.RegistrationIntentService"
