@@ -55,6 +55,13 @@ public class TiGooshModule extends KrollModule {
 	private KrollFunction errorCallback = null;
 	private KrollFunction messageCallback = null;
 
+	/* Callbacks for topics */
+	private KrollFunction successUnsubTopicCallback = null;
+	private KrollFunction successTopicCallback = null;
+	private KrollFunction errorSubTopicCallback = null;
+	private KrollFunction errorTopicCallback = null;
+	private KrollFunction topicCallback = null;
+
 	public TiGooshModule() {
 		super();
 		module = this;
@@ -243,5 +250,91 @@ public class TiGooshModule extends KrollModule {
 		messageCallback.callAsync(getKrollObject(), e);
 	}
 
-}
+	@Kroll.method
+	public void subscribe(final HashMap options) {
+		final String topic  = (String) options.get("topic");
 
+		if (options.get("success") != null) {
+			successTopicCallback = (KrollFunction) options.get("success");
+		}
+		if (options.get("error") != null) {
+			errorTopicCallback = (KrollFunction) options.get("error");
+		}
+
+		if (topic == null || !topic.startsWith("/topics/")) {
+			Log.e(LCAT, "No or invalid topic specified, should start with /topics/");
+			return;
+		}
+
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					String token = getRemoteDeviceUUID();
+					GcmPubSub.getInstance(TiApplication.getInstance()).subscribe(token, topic, null);
+					if (successTopicCallback != null) {
+						// send success callback
+						HashMap<String, Object> data = new HashMap<String, Object>();
+						data.put("success", true);
+						data.put("topic", topic);
+						successTopicCallback.callAsync(getKrollObject(), data);
+					}
+				} catch (Exception ex) {
+					// error
+					Log.e(LCAT, "Error " + ex.toString());
+					if (errorTopicCallback != null) {
+						// send error callback
+						HashMap<String, Object> data = new HashMap<String, Object>();
+						data.put("success", false);
+						data.put("topic", topic);
+						data.put("error", ex.toString());
+						errorTopicCallback.callAsync(getKrollObject(), data);
+					}
+				}
+				return null;
+			}
+		}.execute();
+	}
+
+	@Kroll.method
+	public void unsubscribe(final HashMap options) {
+		final String topic  = (String) options.get("topic");
+		successUnsubTopicCallback = (KrollFunction) options.get("success");
+		errorSubTopicCallback = (KrollFunction) options.get("error");
+
+		if (topic == null || !topic.startsWith("/topics/")) {
+			Log.e(LCAT, "No or invalid topic specified, should start with /topics/");
+			return;
+		}
+
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					String token = getRemoteDeviceUUID();
+					if (token != null) {
+						GcmPubSub.getInstance(TiApplication.getInstance()).unsubscribe(token, topic);
+						if (successUnsubTopicCallback != null) {
+							HashMap<String, Object> data = new HashMap<String, Object>();
+							data.put("success", true);
+							data.put("topic", topic);
+							successUnsubTopicCallback.callAsync(getKrollObject(), data);
+						}
+					} else {
+						HashMap<String, Object> data = new HashMap<String, Object>();
+						data.put("error", true);
+						data.put("topic", topic);
+						errorSubTopicCallback.callAsync(getKrollObject(), data);
+						Log.e(LCAT, "Cannot unsubscribe from topic " + topic);
+					}
+				} catch (Exception ex) {
+					HashMap<String, Object> data = new HashMap<String, Object>();
+					data.put("error", ex.toString());
+					data.put("topic", topic);
+					errorSubTopicCallback.callAsync(getKrollObject(), data);
+				}
+				return null;
+			}
+		}.execute();
+	}
+}
