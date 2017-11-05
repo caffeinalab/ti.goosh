@@ -78,7 +78,13 @@ TiGoosh.registerForPushNotifications({
 ```js
 TiGoosh.unregisterForPushNotifications();
 ```
+## Are notifications enabled
+It will return false if users have disabled notifications from the settings for the app, work from to API 19 (Android 4.4).
+Not work for android before API 19 (Android 4.4), return true.
 
+```js
+TiGoosh.areNotificationsEnabled();
+```
 ## Usage with Trimethyl
 
 [Trimethyl](http://trimethyl.github.io/trimethyl/) uses this module for its *Notifications* library. [http://trimethyl.github.io/trimethyl/notifications.js.html#line155](http://trimethyl.github.io/trimethyl/notifications.js.html#line155), so you can just type:

@@ -39,6 +39,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import android.app.NotificationManager;
+import android.support.v4.app.NotificationManagerCompat;
 
 @Kroll.module(name="TiGoosh", id="ti.goosh")
 public class TiGooshModule extends KrollModule {
@@ -160,6 +161,15 @@ public class TiGooshModule extends KrollModule {
 		}.execute();
 	}
 
+	@Kroll.method
+	public boolean areNotificationsEnabled() {
+		try{
+			return NotificationManagerCompat.from(TiApplication.getInstance().getApplicationContext()).areNotificationsEnabled();
+		}catch(Exception ex){
+			return false;
+		}
+		
+	}
 
 	@Kroll.method
 	public void cancelAll() {
