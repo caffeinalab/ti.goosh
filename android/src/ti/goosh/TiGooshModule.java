@@ -85,13 +85,13 @@ public class TiGooshModule extends KrollModule {
 	            		}
 			}
 
-			if (!notification.isEmpty()) {
+			if (notification != null && !notification.isEmpty()) {
 				sendMessage(notification, true);
 			} else {
 				Log.d(LCAT, "No notification in Intent");
 			}
 		} catch (Exception ex) {
-			Log.e(LCAT, ex.getMessage());
+			Log.e(LCAT, "parseBootIntent" + ex);
 		}
 	}
 
