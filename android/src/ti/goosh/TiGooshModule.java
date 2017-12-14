@@ -39,6 +39,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import android.app.NotificationManager;
+import android.support.v4.app.NotificationManagerCompat;
 
 @Kroll.module(name="TiGoosh", id="ti.goosh")
 public class TiGooshModule extends KrollModule {
@@ -85,13 +86,13 @@ public class TiGooshModule extends KrollModule {
 	            		}
 			}
 
-			if (!notification.isEmpty()) {
+			if (notification != null && !notification.isEmpty()) {
 				sendMessage(notification, true);
 			} else {
 				Log.d(LCAT, "No notification in Intent");
 			}
 		} catch (Exception ex) {
-			Log.e(LCAT, ex.getMessage());
+			Log.e(LCAT, "parseBootIntent" + ex);
 		}
 	}
 
@@ -160,6 +161,15 @@ public class TiGooshModule extends KrollModule {
 		}.execute();
 	}
 
+	@Kroll.method
+	public boolean areNotificationsEnabled() {
+		try{
+			return NotificationManagerCompat.from(TiApplication.getInstance().getApplicationContext()).areNotificationsEnabled();
+		}catch(Exception ex){
+			return false;
+		}
+		
+	}
 
 	@Kroll.method
 	public void cancelAll() {
