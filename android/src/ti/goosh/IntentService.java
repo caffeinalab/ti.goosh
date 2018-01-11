@@ -122,7 +122,8 @@ public class IntentService extends GcmListenerService {
 			alert = data.getAsJsonPrimitive("alert").getAsString();
 		}
 
-		if (alert.isEmpty()) {
+		if (alert.isEmpty() || !data.has("alert")) {
+			showNotification = false;
 			alert = TiApplication.getInstance().getAppInfo().getName();
 		}
 
