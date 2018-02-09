@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -ex
+
+cd ./android
+ti build -p android --build-only
+cd ..
+unzip -o "./android/dist/*.zip"
+rm -rf ./example-app/modules
+mv ./modules ./example-app
+cd ./example-app
+ti build -p android -T device
+cd ..
