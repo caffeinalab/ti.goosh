@@ -78,6 +78,33 @@ TiGoosh.registerForPushNotifications({
 ```js
 TiGoosh.unregisterForPushNotifications();
 ```
+
+## Subscribe/unsubscribe to topics
+```js
+// subscribe
+
+TiGoosh.subscribe({
+	topic: "/topics/myTopic",
+	success: function(e) {
+		console.log("unsub done " + e);
+	},
+	error: function(e){
+		console.error("error")
+	}
+})
+
+// unsubscribe
+
+TiGoosh.unsubscribe({
+	topic: "/topics/myTopic",
+	success: function(e) {
+		console.log("unsub done " + e);
+	},
+	error: function(e){
+		console.error("error")
+	}
+})
+```
 ## Are notifications enabled
 It will return false if users have disabled notifications from the settings for the app, work from to API 19 (Android 4.4).
 Not work for android before API 19 (Android 4.4), return true.
@@ -237,6 +264,40 @@ echo json_encode($json, JSON_PRETTY_PRINT);
 echo exec("curl -X POST -H 'Authorization: key=" . GOOGLE_KEY . "' -H 'Content-Type: application/json' --data " . escapeshellarg(json_encode($json)) . ' https://android.googleapis.com/gcm/send');
 ```
 
+Sending a message to a topic
+```php
+<?php
+	// API access key from Google API's Console
+	define('API_ACCESS_KEY', '.......');
+	// prep the bundle
+	$msg = array
+	(
+		'body' => 'This is a message sent from my http server',
+		'title' => 'From server side',
+		'priority' => 'high',
+		'sound' => 'default',
+		'time_to_live' => 3600
+	);
+	$fields = array('to' => '/topics/myTopic', 'notification' => $msg);
+
+	$headers = array
+	(
+		'Authorization: key=' . API_ACCESS_KEY,
+		'Content-Type: application/json'
+	);
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+	$result = curl_exec($ch);
+	curl_close($ch);
+	echo $result;
+```
+
 ## Handle the notification on the app
 
 The payload of the notifications is the same that comes from your server. 
@@ -258,4 +319,3 @@ A boolean value indicating if the notification has come when the app was in back
 ## LICENSE
 
 MIT.
-
