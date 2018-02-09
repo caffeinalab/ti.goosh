@@ -2,6 +2,12 @@
 
 #### Android Titanium module to work easily with Google Cloud Messaging push notification service... and it's Parse and Parse Server compatible!
 
+## Version compatibility
+
+### v3.* is for Titanium SDK 6.X - branch: release/titanium-6.x
+
+### v4.* is for Titanium SDK 7.X - branch: master
+
 ## Install the module
 
 Unzip the latest release in your module directory and add to tiapp modules, or just type:
