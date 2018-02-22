@@ -31,6 +31,21 @@ To get GCM sender ID:
 * Find your API project and click Project Name.
 * You can find Project Number. You will use it as the GCM sender ID.
 
+### Crashes
+
+If your app crashes on launch, try adding these in your tiapp.xml.
+
+```xml
+<property name="ti.android.bug2373.disableDetection" type="bool">true</property>
+<property name="ti.android.bug2373.finishfalseroot" type="bool">true</property>
+<property name="ti.android.bug2373.restartDelay" type="int">500</property>
+<property name="ti.android.bug2373.finishDelay" type="int">0</property>
+<property name="ti.android.bug2373.skipAlert" type="bool">true</property>
+<property name="ti.android.bug2373.message">Initializing</property>
+<property name="ti.android.bug2373.title">Restart Required</property>
+<property name="ti.android.bug2373.buttonText">Continue</property>
+```
+
 ## Set the Google Play Services SDK version
 
 In your  `tiapp.xml`, in the node **android > manifest > application**, insert:
