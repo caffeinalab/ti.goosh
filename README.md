@@ -31,6 +31,16 @@ To get GCM sender ID:
 * Find your API project and click Project Name.
 * You can find Project Number. You will use it as the GCM sender ID.
 
+## Set the channel name (basic support for Android Oreo)
+
+In your tiapp.xml, insert
+
+```xml
+<property name="ti.goosh.defaultChannel">YOUR_CHANNEL_NAME</property>
+```
+
+<img src="oreo.png" />
+
 ### Crashes
 
 If your app crashes on launch, try adding these in your tiapp.xml.
