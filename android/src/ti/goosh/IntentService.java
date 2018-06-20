@@ -119,7 +119,11 @@ public class IntentService extends GcmListenerService {
 
 		// overwrite the alert
 		if (data != null && data.has("alert")) {
-			alert = data.getAsJsonPrimitive("alert").getAsString();
+			try {
+				alert = data.getAsJsonPrimitive("alert").getAsString();
+			} catch(Exception ex) {
+				Log.e(LCAT, "Error getting alert string. Most probably it's an object: " + ex.getMessage());
+			}
 		}
 
 		if (alert.isEmpty() || !data.has("alert")) {
