@@ -388,8 +388,13 @@ public class IntentService extends GcmListenerService {
 			if (data != null && data.has("id")) {
 				// ensure that the id sent from the server is negative to prevent
 				// collision with the atomic integer
-				id = -1 * Math.abs(data.getAsJsonPrimitive("id").getAsInt());
-			} else {
+				JsonElement idJson = data.get("id");
+				if (idJson.isJsonPrimitive() && idJson.getAsJsonPrimitive().isNumber()) {
+					id = -1 * Math.abs(idJson.getAsJsonPrimitive().getAsInt());
+				}
+			} 
+
+			if (id == 0) {
 				id = atomic.getAndIncrement();
 			}
 
