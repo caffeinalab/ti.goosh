@@ -13,7 +13,9 @@ import java.lang.reflect.Type;
 import java.lang.Math;
 import java.util.Random;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -23,6 +25,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -43,6 +46,9 @@ public class IntentService extends GcmListenerService {
 
 	private static final String LCAT = "ti.goosh.IntentService";
 	private static final AtomicInteger atomic = new AtomicInteger(0);
+
+	public static final String DEFAULT_CHANNEL_ID = "ti.goosh.defaultchannel";
+	public static final String DEFAULT_CHANNEL_NAME = "Push Notifications";
 
 	@Override
 	public void onMessageReceived(String from, Bundle bundle) {
@@ -76,6 +82,15 @@ public class IntentService extends GcmListenerService {
 		connection.setUseCaches(false); // Android BUG
 		connection.connect();
 		return BitmapFactory.decodeStream( new BufferedInputStream( connection.getInputStream() ) );
+	}
+
+	@TargetApi(26)
+	private NotificationChannel createOrUpdateDefaultNotificationChannel() {
+		NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		String channelName = TiApplication.getInstance().getAppProperties().getString("ti.goosh.defaultChannel", DEFAULT_CHANNEL_NAME);
+		NotificationChannel channel = new NotificationChannel(DEFAULT_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+		notificationManager.createNotificationChannel(channel);
+		return channel;
 	}
 
 	private void parseNotification(Bundle bundle) {
@@ -161,8 +176,14 @@ public class IntentService extends GcmListenerService {
 			PendingIntent contentIntent = PendingIntent.getActivity(this, new Random().nextInt(), notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
 			// Start building notification
+			NotificationCompat.Builder builder = null;
 
-			NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				builder = new NotificationCompat.Builder(context, createOrUpdateDefaultNotificationChannel().getId());
+			} else {
+				builder = new NotificationCompat.Builder(context);
+			}
+
 			int builder_defaults = 0;
 			builder.setContentIntent(contentIntent);
 			builder.setAutoCancel(true);
