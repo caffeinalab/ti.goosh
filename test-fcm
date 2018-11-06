@@ -1,41 +1,65 @@
 #!/usr/bin/php
 <?php
-function sendGCM($id) {
 
+$ID = getenv('DEVICE_ID');
+$KEY = getenv('SERVER_KEY');
 
-    $url = 'https://fcm.googleapis.com/fcm/send';
-
-    $fields = array (
-            'registration_ids' => array (
-                    $id
-            ),
-            "data"    => [
-			    "data"  => [
-			      "alert"     => "Testing " . time(),
-			      "title"     => "The title",
-			      "vibrate"   => [100,50,50,50,100],
-			      "badge"     => 1,
-			      "tag"       => "APP"
-			    ]
-			  ]
-    );
-    $fields = json_encode ( $fields );
-
-    $headers = array (
-            'Authorization: key=' . "<AUTH KEY>",
-            'Content-Type: application/json'
-    );
-
-    $ch = curl_init ();
-    curl_setopt ( $ch, CURLOPT_URL, $url );
-    curl_setopt ( $ch, CURLOPT_POST, true );
-    curl_setopt ( $ch, CURLOPT_HTTPHEADER, $headers );
-    curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, true );
-    curl_setopt ( $ch, CURLOPT_POSTFIELDS, $fields );
-
-    $result = curl_exec ( $ch );
-    echo $result;
-    curl_close ( $ch );
+if (empty($KEY)) {
+  $KEY = "AIzaSyAKhb8Q5B0EOtpQ5u087hbxKvT0O_vP9jc";
 }
 
-sendGCM("DEVICE TOKEN");
+function sendGCM($id, $auth) {
+  $url = 'https://android.googleapis.com/gcm/send';
+  
+  return post($url, headers($auth), fields($id));
+}
+
+function sendFCM($id, $auth) {
+  $url = 'https://fcm.googleapis.com/fcm/send';
+
+  return post($url, headers($auth), fields($id));
+}
+
+function fields($id) {
+  return json_encode( array (
+    'registration_ids' => array ( $id ),
+    "data"    => [ "data"  => payload() ]
+  ) );
+}
+
+function headers($auth) {
+  return array (
+    'Authorization: key=' . $auth,
+    'Content-Type: application/json'
+  );
+}
+
+function payload() {
+  return [
+    "alert"     => "Testing " . time(),
+    "title"     => "The title ". time(),
+    "vibrate"   => [100,50,50,50,100],
+    "sound"     => "default",
+    "badge"     => 1,
+    "tag"       => "TestApp",
+    "group"     => "Group x",
+    "group_summary" => 1,
+    "force_show_in_foreground" => false
+  ];
+}
+
+function post($url, $headers, $data) {
+  $ch = curl_init ();
+  curl_setopt ( $ch, CURLOPT_URL, $url );
+  curl_setopt ( $ch, CURLOPT_POST, true );
+  curl_setopt ( $ch, CURLOPT_HTTPHEADER, $headers );
+  curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, true );
+  curl_setopt ( $ch, CURLOPT_SSL_VERIFYPEER, false );
+  curl_setopt ( $ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+  curl_setopt ( $ch, CURLOPT_POSTFIELDS, $data );
+  $result = curl_exec ( $ch );
+  curl_close ( $ch );
+  return $result;
+}
+
+echo sendFCM($ID, $KEY);

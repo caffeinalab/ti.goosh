@@ -8,7 +8,7 @@
 				<meta-data
 				    android:name="com.google.firebase.messaging.default_notification_color"
 				    android:resource="@color/colorAccent" />
-				
+
 				<!-- [START gcm_listener] -->
 				<service
 					android:name="ti.goosh.FcmMessagingService" android:exported="true">
@@ -17,6 +17,16 @@
 					</intent-filter>
 				</service>
 				<!-- [END gcm_listener] -->
+
+				<!-- [START instanceId_listener] -->
+		        <service
+		            android:name="ti.goosh.InstanceIDListener"
+		            android:exported="false">
+		            <intent-filter>
+		                <action android:name="com.google.android.gms.iid.InstanceID"/>
+		            </intent-filter>
+		        </service>
+		        <!-- [END instanceId_listener] -->
 
 				<service
 				    android:name="ti.goosh.FcmListenerService" android:exported="true">
@@ -28,7 +38,7 @@
 				<activity android:name="ti.goosh.FcmIntent"
 		                 android:exported="true">
 		        </activity>
-	
+
 				<!-- <activity
 					android:name="ti.goosh.PushHandlerActivity"
 					android:exported="true">
@@ -38,4 +48,7 @@
 
 		</manifest>
 	</android>
+	<modules>
+		<module platform="android">ti.playservices</module>
+	</modules>
 </ti:module>

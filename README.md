@@ -2,6 +2,12 @@
 
 #### Android Titanium module to work easily with Google Cloud Messaging push notification service... and it's Parse and Parse Server compatible!
 
+## Version compatibility
+
+### v3.* is for Titanium SDK 6.X - branch: release/titanium-6.x
+
+### v4.* is for Titanium SDK 7.X - branch: master
+
 ## Install the module
 
 Unzip the latest release in your module directory and add to tiapp modules, or just type:
@@ -24,6 +30,31 @@ To get GCM sender ID:
 * If you haven't created an API project yet, click Create Project.
 * Find your API project and click Project Name.
 * You can find Project Number. You will use it as the GCM sender ID.
+
+## Set the channel name (basic support for Android Oreo)
+
+In your tiapp.xml, insert
+
+```xml
+<property name="ti.goosh.defaultChannel">YOUR_CHANNEL_NAME</property>
+```
+
+<img src="oreo.png" />
+
+### Crashes
+
+If your app crashes on launch, try adding these in your tiapp.xml.
+
+```xml
+<property name="ti.android.bug2373.disableDetection" type="bool">true</property>
+<property name="ti.android.bug2373.finishfalseroot" type="bool">true</property>
+<property name="ti.android.bug2373.restartDelay" type="int">500</property>
+<property name="ti.android.bug2373.finishDelay" type="int">0</property>
+<property name="ti.android.bug2373.skipAlert" type="bool">true</property>
+<property name="ti.android.bug2373.message">Initializing</property>
+<property name="ti.android.bug2373.title">Restart Required</property>
+<property name="ti.android.bug2373.buttonText">Continue</property>
+```
 
 ## Set the Google Play Services SDK version
 
@@ -79,6 +110,39 @@ TiGoosh.registerForPushNotifications({
 TiGoosh.unregisterForPushNotifications();
 ```
 
+## Subscribe/unsubscribe to topics
+```js
+// subscribe
+
+TiGoosh.subscribe({
+	topic: "/topics/myTopic",
+	success: function(e) {
+		console.log("unsub done " + e);
+	},
+	error: function(e){
+		console.error("error")
+	}
+})
+
+// unsubscribe
+
+TiGoosh.unsubscribe({
+	topic: "/topics/myTopic",
+	success: function(e) {
+		console.log("unsub done " + e);
+	},
+	error: function(e){
+		console.error("error")
+	}
+})
+```
+## Are notifications enabled
+It will return false if users have disabled notifications from the settings for the app, work from to API 19 (Android 4.4).
+Not work for android before API 19 (Android 4.4), return true.
+
+```js
+TiGoosh.areNotificationsEnabled();
+```
 ## Usage with Trimethyl
 
 [Trimethyl](http://trimethyl.github.io/trimethyl/) uses this module for its *Notifications* library. [http://trimethyl.github.io/trimethyl/notifications.js.html#line155](http://trimethyl.github.io/trimethyl/notifications.js.html#line155), so you can just type:
@@ -92,7 +156,7 @@ to activate the notifications for both iOS / Android.
 ## Properties
 
 Property | Type | Description
---- | ---| --- | ----
+--- | --- | ----
 remoteNotificationsEnabled | Boolean | Check if the notifications are registered with `registerForPushNotifications`.
 remoteDeviceUUID | String | Get the device token previously obtained.
 
@@ -170,6 +234,7 @@ Property | Type | Default | Description
 --- | --- | --- | ----
 alert | String | `null` | The message to show in the notification center and in the status bar. 
 title | String | App Title | The title to show in the notification center.
+sound | String | `false` | The sound of the notification. If `true` or `default` the default sound is used, otherwise you can specificy an audio file path located in the app bundle (`/assets/`)
 vibrate | Boolean | `false` | Control the vibration of the phone.
 vibrate | Array | `null` | This property can also be an array with a pattern. When the notification is received the device will vibrate following that pattern
 lights | Object | `null` | This optional property sets the LED light color and frequency. Check out the property description below on how to send it
@@ -230,6 +295,40 @@ echo json_encode($json, JSON_PRETTY_PRINT);
 echo exec("curl -X POST -H 'Authorization: key=" . GOOGLE_KEY . "' -H 'Content-Type: application/json' --data " . escapeshellarg(json_encode($json)) . ' https://android.googleapis.com/gcm/send');
 ```
 
+Sending a message to a topic
+```php
+<?php
+	// API access key from Google API's Console
+	define('API_ACCESS_KEY', '.......');
+	// prep the bundle
+	$msg = array
+	(
+		'body' => 'This is a message sent from my http server',
+		'title' => 'From server side',
+		'priority' => 'high',
+		'sound' => 'default',
+		'time_to_live' => 3600
+	);
+	$fields = array('to' => '/topics/myTopic', 'notification' => $msg);
+
+	$headers = array
+	(
+		'Authorization: key=' . API_ACCESS_KEY,
+		'Content-Type: application/json'
+	);
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+	$result = curl_exec($ch);
+	curl_close($ch);
+	echo $result;
+```
+
 ## Handle the notification on the app
 
 The payload of the notifications is the same that comes from your server. 
@@ -251,4 +350,3 @@ A boolean value indicating if the notification has come when the app was in back
 ## LICENSE
 
 MIT.
-

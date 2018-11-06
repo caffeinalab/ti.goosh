@@ -1,8 +1,0 @@
-"/Users/andy/Repos/Mobile/ti.goosh/android/build/generated/java/ti/goosh/TiGooshBootstrap.java"
-"/Users/andy/Repos/Mobile/ti.goosh/android/src/ti/goosh/BadgeUtils.java"
-"/Users/andy/Repos/Mobile/ti.goosh/android/src/ti/goosh/FcmIntent.java"
-"/Users/andy/Repos/Mobile/ti.goosh/android/src/ti/goosh/FcmListenerService.java"
-"/Users/andy/Repos/Mobile/ti.goosh/android/src/ti/goosh/FcmMessagingService.java"
-"/Users/andy/Repos/Mobile/ti.goosh/android/src/ti/goosh/IntentService.java"
-"/Users/andy/Repos/Mobile/ti.goosh/android/src/ti/goosh/PushHandlerActivity.java"
-"/Users/andy/Repos/Mobile/ti.goosh/android/src/ti/goosh/TiGooshModule.java"

@@ -2,9 +2,9 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 3.0.0
-apiversion: 3
-architectures: armeabi-v7a x86
+version: 4.1.1
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86
 description: ti.goosh
 author: Flavio De Stefano
 license: MIT
@@ -15,4 +15,4 @@ name: ti.goosh
 moduleid: ti.goosh
 guid: 5ad17cbc-1fed-4f20-8f27-6d1baa49ea9f
 platform: android
-minsdk: 6.0.0
+minsdk: 7.0.0

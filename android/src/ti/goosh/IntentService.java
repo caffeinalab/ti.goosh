@@ -2,6 +2,7 @@ package ti.goosh;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.io.IOException;
 import java.net.URL;
 import java.net.HttpURLConnection;
@@ -12,7 +13,9 @@ import java.lang.reflect.Type;
 import java.lang.Math;
 import java.util.Random;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -22,6 +25,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -44,6 +48,9 @@ public class IntentService extends FirebaseMessagingService {
 
 	private static final String LCAT = "ti.goosh.IntentService";
 	private static final AtomicInteger atomic = new AtomicInteger(0);
+
+	public static final String DEFAULT_CHANNEL_ID = "ti.goosh.defaultchannel";
+	public static final String DEFAULT_CHANNEL_NAME = "Push Notifications";
 
 	@Override
 	public void onMessageReceived(RemoteMessage message) {
@@ -73,6 +80,15 @@ public class IntentService extends FirebaseMessagingService {
 		return BitmapFactory.decodeStream( new BufferedInputStream( connection.getInputStream() ) );
 	}
 
+	@TargetApi(26)
+	private NotificationChannel createOrUpdateDefaultNotificationChannel() {
+		NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		String channelName = TiApplication.getInstance().getAppProperties().getString("ti.goosh.defaultChannel", DEFAULT_CHANNEL_NAME);
+		NotificationChannel channel = new NotificationChannel(DEFAULT_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+		notificationManager.createNotificationChannel(channel);
+		return channel;
+	}
+
 	private void parseNotification(Bundle bundle) {
 		TiGooshModule module = TiGooshModule.getModule();
 
@@ -83,80 +99,103 @@ public class IntentService extends FirebaseMessagingService {
 		Boolean sendMessage = !appInBackground;
 
 		// Flag to show the system alert
-		Boolean showNotification = true;
+		Boolean showNotification = appInBackground;
 
-		String jsonData = bundle.getString("data");
+		// the title and alert
+		String title = bundle.getString("title", bundle.getString("message", ""));
+		String alert = bundle.getString("data", "");
+
+		// get the `data` or fallback for `custom` (OneSignal)
+
+		String jsonData = bundle.getString("data", bundle.getString("custom", getCountlyId(bundle)));
 		JsonObject data = null;
 
-		try {
-			data = (JsonObject) new Gson().fromJson(jsonData, JsonObject.class);
-		} catch (Exception ex) {
-			Log.e(LCAT, "Error parsing data JSON: " + ex.getMessage());
-			return;
+		if (jsonData != null) {
+			try {
+				data = (JsonObject) new Gson().fromJson(jsonData, JsonObject.class);
+			} catch (Exception ex) {
+				Log.e(LCAT, "Error parsing data JSON: " + ex.getMessage());
+			}
 		}
 
-		if (data != null && data.has("alert") == true) {
+		// OneSignal does not send as `alert`, but `a` instead.
+		if (data != null && data.has("alert") == false && data.has("a") == true) {
+			data = data.getAsJsonObject("a");
+		}
 
-			if (appInBackground) {
-				showNotification = true;
+		// overwrite the alert
+		if (data != null && data.has("title")) {
+			title = data.getAsJsonPrimitive("title").getAsString();
+		}
+
+		// overwrite the alert
+		if (data != null && data.has("alert")) {
+			JsonElement alertJson = data.get("alert");
+
+			if (alertJson.isJsonPrimitive()) {
+				alert = alertJson.getAsJsonPrimitive().getAsString();
 			} else {
-				if (data.has("force_show_in_foreground")) {
-					JsonPrimitive forceShowInForeground = data.getAsJsonPrimitive("force_show_in_foreground");
-					showNotification = ((forceShowInForeground.isBoolean() && forceShowInForeground.getAsBoolean() == true));
-				} else {
-					showNotification = false;
-				}
+				Log.e(LCAT, "Error getting alert string. Most probably it's an object");
 			}
-
-		} else {
-
-			Log.i(LCAT, "Not showing notification cause missing data.alert");
-			showNotification = false;
-
-			// Parse additional silent features
-
-			if (data != null && data.has("badge")) {
-				int badge = data.getAsJsonPrimitive("badge").getAsInt();
-				BadgeUtils.setBadge(context, badge);
-			}
-
 		}
 
-		if (sendMessage) {
+		if (alert.isEmpty() || !data.has("alert")) {
+			showNotification = false;
+			alert = TiApplication.getInstance().getAppInfo().getName();
+		}
+
+		if (!appInBackground) {
+			if (data != null && data.has("force_show_in_foreground")) {
+				JsonPrimitive forceShowInForeground = data.getAsJsonPrimitive("force_show_in_foreground");
+				showNotification = ((forceShowInForeground.isBoolean() && forceShowInForeground.getAsBoolean() == true));
+			} else {
+				showNotification = false;
+			}
+		}
+
+		if (data != null && data.has("badge") == true) {
+			int badge = data.getAsJsonPrimitive("badge").getAsInt();
+			BadgeUtils.setBadge(context, badge);
+		}
+
+		if (sendMessage && module != null) {
 			module.sendMessage(jsonData, appInBackground);
 		}
 
 		if (showNotification) {
+			Log.w(LCAT, "Show Notification: TRUE");
 
 			Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
-			notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			notificationIntent.putExtra(TiGooshModule.INTENT_EXTRA, jsonData);
 
 			PendingIntent contentIntent = PendingIntent.getActivity(this, new Random().nextInt(), notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
 			// Start building notification
+			NotificationCompat.Builder builder = null;
 
-			NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				builder = new NotificationCompat.Builder(context, createOrUpdateDefaultNotificationChannel().getId());
+			} else {
+				builder = new NotificationCompat.Builder(context);
+			}
+
 			int builder_defaults = 0;
 			builder.setContentIntent(contentIntent);
 			builder.setAutoCancel(true);
 			builder.setPriority(2);
 
-			// Body 
+			// Title
+			builder.setContentTitle(title);
 
-			String alert = null;
-			if (data.has("alert")) {
-				alert = data.getAsJsonPrimitive("alert").getAsString();
-				builder.setContentText(alert);
-				builder.setTicker(alert);
-			}
+			// alert
+			builder.setContentText(alert);
+			builder.setTicker(alert);
 
 			// BigText
-
-			String big_text = null;
-			if (data.has("big_text")) {
+			if (data != null && data.has("big_text")) {
 				NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-				bigTextStyle.bigText( data.getAsJsonPrimitive("big_text").getAsString() );
+				bigTextStyle.bigText(data.getAsJsonPrimitive("big_text").getAsString());
 
 				if (data.has("big_text_summary")) {
 					bigTextStyle.setSummaryText( data.getAsJsonPrimitive("big_text_summary").getAsString() );
@@ -166,7 +205,6 @@ public class IntentService extends FirebaseMessagingService {
 			}
 
 			// Icons
-
 			try {
 				int smallIcon = this.getResource("drawable", "notificationicon");
 				if (smallIcon > 0) {
@@ -177,7 +215,7 @@ public class IntentService extends FirebaseMessagingService {
 			}
 
 			// Large icon
-			if (data.has("icon")) {
+			if (data != null && data.has("icon")) {
 				try {
 					Bitmap icon = this.getBitmapFromURL( data.getAsJsonPrimitive("icon").getAsString() );
 					builder.setLargeIcon(icon);
@@ -187,31 +225,24 @@ public class IntentService extends FirebaseMessagingService {
 			}
 
 			// Color
-			if (data.has("color")) {
+			if (data != null && data.has("color")) {
 				try {
 					int color = Color.parseColor( data.getAsJsonPrimitive("color").getAsString() );
 					builder.setColor( color );
 				} catch (Exception ex) {
 					Log.e(LCAT, "Color exception: " + ex.getMessage());
 				}
-			}			
-
-			// Title
-			if (data.has("title")) {
-				builder.setContentTitle( data.getAsJsonPrimitive("title").getAsString() );
-			} else {
-				builder.setContentTitle( TiApplication.getInstance().getAppInfo().getName() );
 			}
 
 			// Badge
-			if (data.has("badge")) {
+			if (data != null && data.has("badge")) {
 				int badge = data.getAsJsonPrimitive("badge").getAsInt();
 				BadgeUtils.setBadge(context, badge);
 				builder.setNumber(badge);
 			}
 
-			// Sound 
-			if (data.has("sound")) {
+			// Sound
+			if (data != null && data.has("sound")) {
 				JsonPrimitive sound = data.getAsJsonPrimitive("sound");
 				if ( ("default".equals(sound.getAsString())) || (sound.isBoolean() && sound.getAsBoolean() == true) ) {
 					builder_defaults |= Notification.DEFAULT_SOUND;
@@ -222,7 +253,7 @@ public class IntentService extends FirebaseMessagingService {
 			}
 
 			// Vibration
-			if (data.has("vibrate")) {
+			if (data != null && data.has("vibrate")) {
 				try {
 					JsonElement vibrateJson = data.get("vibrate");
 
@@ -234,11 +265,11 @@ public class IntentService extends FirebaseMessagingService {
 						}
 					} else if (vibrateJson.isJsonArray()) {
 						JsonArray vibrate = vibrateJson.getAsJsonArray();
-						
+
 						if (vibrate.size() > 0) {
 							long[] pattern = new long[vibrate.size()];
 							int i = 0;
-							
+
 							for(i = 0; i < vibrate.size(); i++) {
 								pattern[i] = vibrate.get(i).getAsLong();
 							}
@@ -250,10 +281,10 @@ public class IntentService extends FirebaseMessagingService {
 					Log.e(LCAT, "Vibrate exception: " + ex.getMessage());
 				}
 			}
-			
-			
+
+
 			// Lights
-			if (data.has("lights")) {
+			if (data != null && data.has("lights")) {
 				try {
 					JsonElement lightsJson = data.get("lights");
 
@@ -273,10 +304,10 @@ public class IntentService extends FirebaseMessagingService {
 			} else {
 				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
-			
+
 
 			// Ongoing
-			if (data.has("ongoing")) {
+			if (data != null && data.has("ongoing")) {
 				try {
 					JsonElement ongoingJson = data.get("ongoing");
 
@@ -293,7 +324,7 @@ public class IntentService extends FirebaseMessagingService {
 			}
 
 			// Group
-			if (data.has("group")) {
+			if (data != null && data.has("group")) {
 				try {
 					JsonElement groupJson = data.get("group");
 
@@ -307,10 +338,10 @@ public class IntentService extends FirebaseMessagingService {
 			} else {
 				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
-			
+
 
 			// GroupSummary
-			if (data.has("group_summary")) {
+			if (data != null && data.has("group_summary")) {
 				try {
 					JsonElement groupsumJson = data.get("group_summary");
 
@@ -324,10 +355,10 @@ public class IntentService extends FirebaseMessagingService {
 			} else {
 				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
-			
+
 
 			// When
-			if (data.has("when")) {
+			if (data != null && data.has("when")) {
 				try {
 					JsonElement whenJson = data.get("when");
 
@@ -341,10 +372,10 @@ public class IntentService extends FirebaseMessagingService {
 			} else {
 				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
-			
+
 
 			// Only alert once
-			if (data.has("only_alert_once")) {
+			if (data != null && data.has("only_alert_once")) {
 				try {
 					JsonElement oaoJson = data.get("only_alert_once");
 
@@ -358,31 +389,42 @@ public class IntentService extends FirebaseMessagingService {
 			} else {
 				builder_defaults |= Notification.DEFAULT_LIGHTS;
 			}
-			
+
 			// Builder defaults OR
 			builder.setDefaults(builder_defaults);
 
 
 			// Tag
 			String tag = null;
-			if (data.has("tag")) {
+			if (data != null && data.has("tag")) {
 				tag = data.getAsJsonPrimitive("tag").getAsString();
 			}
 
 			// Nid
 			int id = 0;
-			if (data.has("id")) {
+			if (data != null && data.has("id")) {
 				// ensure that the id sent from the server is negative to prevent
 				// collision with the atomic integer
-				id = -1 * Math.abs(data.getAsJsonPrimitive("id").getAsInt());
-			} else {
+				JsonElement idJson = data.get("id");
+				if (idJson.isJsonPrimitive() && idJson.getAsJsonPrimitive().isNumber()) {
+					id = -1 * Math.abs(idJson.getAsJsonPrimitive().getAsInt());
+				}
+			} 
+
+			if (id == 0) {
 				id = atomic.getAndIncrement();
 			}
 
 			// Send
 			NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(tag, id, builder.build());
+		} else {
+			Log.w(LCAT, "Show Notification: FALSE");
 		}
 	}
 
+	private String getCountlyId(Bundle bundle) {
+		String id = bundle.getString("c.i");
+		return "{\"c.i\": \"" + id + "\"}";
+	}
 }
