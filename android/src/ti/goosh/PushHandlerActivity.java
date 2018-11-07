@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.kroll.KrollRuntime;
 
 public class PushHandlerActivity extends Activity {
@@ -49,5 +48,5 @@ public class PushHandlerActivity extends Activity {
 		Log.d(LCAT, "resumed");
 		super.onResume();
 	}
-	
+
 }

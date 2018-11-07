@@ -13,10 +13,10 @@ import android.util.Log;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 import android.app.Activity;
-import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.util.TiRHelper;
 
 import com.google.android.gms.gcm.GcmListenerService;
@@ -29,7 +29,15 @@ public class BroadcastReceiver extends GcmReceiver {
     public void onReceive(Context context, Intent intent) {
         ComponentName comp = new ComponentName(context.getPackageName(),
                 IntentService.class.getName());
-        startWakefulService(context, (intent.setComponent(comp)));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                GcmJobService.scheduleJob(context, extras);
+            }
+        } else {
+            startWakefulService(context, (intent.setComponent(comp)));
+        }
         setResultCode(Activity.RESULT_OK);
 
         Log.d(LCAT, "started");

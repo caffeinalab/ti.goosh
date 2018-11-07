@@ -61,6 +61,16 @@ public class IntentService extends GcmListenerService {
 		parseNotification(bundle);
 	}
 
+	public void handleMessage(Context context, Bundle bundle) {
+		Log.d(LCAT, "Push notification received");
+		for (String key : bundle.keySet()) {
+			Object value = bundle.get(key);
+			Log.d(LCAT, String.format("Notification key : %s => %s (%s)", key, value.toString(), value.getClass().getName()));
+		}
+
+		parseNotification(context, bundle);
+	}
+
 	private int getResource(String type, String name) {
 		int icon = 0;
 		if (name != null) {
@@ -85,8 +95,8 @@ public class IntentService extends GcmListenerService {
 	}
 
 	@TargetApi(26)
-	private NotificationChannel createOrUpdateDefaultNotificationChannel() {
-		NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+	private NotificationChannel createOrUpdateDefaultNotificationChannel(Context context) {
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		String channelName = TiApplication.getInstance().getAppProperties().getString("ti.goosh.defaultChannel", DEFAULT_CHANNEL_NAME);
 		NotificationChannel channel = new NotificationChannel(DEFAULT_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT);
 		notificationManager.createNotificationChannel(channel);
@@ -94,9 +104,12 @@ public class IntentService extends GcmListenerService {
 	}
 
 	private void parseNotification(Bundle bundle) {
+		parseNotification(getApplicationContext(), bundle);
+	}
+
+	private void parseNotification(Context context, Bundle bundle) {
 		TiGooshModule module = TiGooshModule.getModule();
 
-		Context context = getApplicationContext();
 		Boolean appInBackground = !TiApplication.isCurrentActivityInForeground();
 
 		// Flag that determine if the message should be broadcasted to TiGooshModule and call the callback
@@ -169,17 +182,17 @@ public class IntentService extends GcmListenerService {
 		if (showNotification) {
 			Log.w(LCAT, "Show Notification: TRUE");
 
-			Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
+			Intent notificationIntent = new Intent(context, PushHandlerActivity.class);
 			notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			notificationIntent.putExtra(TiGooshModule.INTENT_EXTRA, jsonData);
 
-			PendingIntent contentIntent = PendingIntent.getActivity(this, new Random().nextInt(), notificationIntent, PendingIntent.FLAG_ONE_SHOT);
+			PendingIntent contentIntent = PendingIntent.getActivity(context, new Random().nextInt(), notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
 			// Start building notification
 			NotificationCompat.Builder builder = null;
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-				builder = new NotificationCompat.Builder(context, createOrUpdateDefaultNotificationChannel().getId());
+				builder = new NotificationCompat.Builder(context, createOrUpdateDefaultNotificationChannel(context).getId());
 			} else {
 				builder = new NotificationCompat.Builder(context);
 			}
@@ -413,14 +426,14 @@ public class IntentService extends GcmListenerService {
 				if (idJson.isJsonPrimitive() && idJson.getAsJsonPrimitive().isNumber()) {
 					id = -1 * Math.abs(idJson.getAsJsonPrimitive().getAsInt());
 				}
-			} 
+			}
 
 			if (id == 0) {
 				id = atomic.getAndIncrement();
 			}
 
 			// Send
-			NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(tag, id, builder.build());
 		} else {
 			Log.w(LCAT, "Show Notification: FALSE");
