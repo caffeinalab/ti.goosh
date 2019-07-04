@@ -1,5 +1,8 @@
 <img src="logo.jpg" />
 
+# DEPRECATION NOTICE
+### This module has been deprecated together with Google Cloud Messaging, and it will not be maintained. If you want to add Firebase Cloud Messaging to your project, you should consider using [TiFirebase](https://github.com/hansemannn/titanium-firebase)
+
 #### Android Titanium module to work easily with Google Cloud Messaging push notification service... and it's Parse and Parse Server compatible!
 
 ## Version compatibility
