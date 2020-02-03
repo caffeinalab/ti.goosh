@@ -11,6 +11,8 @@
 
 ### v4.* is for Titanium SDK 7.X - branch: master
 
+### v5.* is for Titanium SDK 8.3.X - branch: master
+
 ## Install the module
 
 Unzip the latest release in your module directory and add to tiapp modules, or just type:
@@ -87,9 +89,9 @@ TiGoosh.registerForPushNotifications({
 
 	// The callback to invoke when a notification arrives.
 	callback: function(e) {
-	
+
 		var data = JSON.parse(e.data || '');
-	
+
 	},
 
 	// The callback invoked when you have the device token.
@@ -195,7 +197,7 @@ TiGoosh.cancelWithTag(String tag, int id);
 
 The module sets the notification tray icon taking it from `/platform/android/res/drawable-*/notificationicon.png`.
 
-It should be flat (no gradients), white and face-on perspective. 
+It should be flat (no gradients), white and face-on perspective.
 
 **NB: You have to generate the icon with all resolutions.**
 
@@ -235,20 +237,20 @@ The payload of the notification is compatible with *Parse server*.
 
 Property | Type | Default | Description
 --- | --- | --- | ----
-alert | String | `null` | The message to show in the notification center and in the status bar. 
+alert | String | `null` | The message to show in the notification center and in the status bar.
 title | String | App Title | The title to show in the notification center.
 sound | String | `false` | The sound of the notification. If `true` or `default` the default sound is used, otherwise you can specificy an audio file path located in the app bundle (`/assets/`)
 vibrate | Boolean | `false` | Control the vibration of the phone.
 vibrate | Array | `null` | This property can also be an array with a pattern. When the notification is received the device will vibrate following that pattern
 lights | Object | `null` | This optional property sets the LED light color and frequency. Check out the property description below on how to send it
 badge | Number | `null` | The icon on the launchscreen will display this number on the right-top corner if supported.
-icon | String | `null` | A URL represting a large icon to show. 
+icon | String | `null` | A URL represting a large icon to show.
 color | String | `null` | Background color of the notification icon
 tag | String | `null` | Tag of this notification.
 id | Number | `null` | ID of this notification.
 force_show_in_foreground | Boolean | `false` | Control if notification must be shown as alert even if app is in foreground.
 ongoing | Boolean | `false` | Set whether this is an ongoing notification.
-group | String | `null` | Set this notification to be part of a group of notifications sharing the same key. 
+group | String | `null` | Set this notification to be part of a group of notifications sharing the same key.
 group_summary | Boolean | `null` | Sets whether this notification is the main one for it's group
 when | Number | `null` | Set the time that the event occurred. Notifications in the panel are sorted by this time.
 only_alert_once | Boolean | `null` | Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.
@@ -334,9 +336,9 @@ Sending a message to a topic
 
 ## Handle the notification on the app
 
-The payload of the notifications is the same that comes from your server. 
+The payload of the notifications is the same that comes from your server.
 
-**NB: You have to parse the `data` object on the javascript side:** 
+**NB: You have to parse the `data` object on the javascript side:**
 
 ```
 function(e) {
